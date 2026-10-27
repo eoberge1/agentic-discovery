@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "productsense": {
+      "type": "http",
+      "url": "https://app.prod.productsense.com/mcp"
+    }
+  }
+}
