@@ -67,7 +67,7 @@ This document defines the **Agentic Discovery** process that sits before the **A
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         4. PRIORITIZE                                       │
-│         PM / PO decides which intent.md's go to implementation              │
+│         Decide which intent.md's go to implementation                       │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -100,7 +100,7 @@ All sources feed into the same process. The triage agent normalizes them.
 
 **What:** Create an opportunity with a draft `intent.md`. This is the atomic unit of discovery.
 
-**Who:** Anyone can create an opportunity. The PM owns it once created.
+**Who:** Anyone can create an opportunity. An **opportunity owner** is assigned (defaults to creator, or explicitly assigned).
 
 **How:** Use the `opportunity` skill or create directly in ProductSense. The opportunity must contain at minimum:
 
@@ -127,7 +127,7 @@ All sources feed into the same process. The triage agent normalizes them.
 
 **What:** The triage agent assesses each new opportunity and enriches it with context. This is the key innovation—front-loading intelligence so routing is informed.
 
-**Who:** Agent runs automatically on new opportunities. PM reviews output.
+**Who:** Agent runs automatically on new opportunities. Opportunity owner reviews output.
 
 ### 5.1 What the Triage Agent Does
 
@@ -200,7 +200,7 @@ The triage agent can recommend **disqualification** when continuing would waste 
 | **Duplicate of active work** | Exact same ask as an opportunity already in Plan or Curated | Link to active opportunity, recommend merge instead |
 | **No customer or strategic basis** | Internal suggestion with no customer evidence and no strategic driver | Note absence of basis, recommend disqualify |
 
-**Key rule:** The agent recommends disqualification with reasoning. The PM confirms or overrides. Disqualified opportunities are archived with the reason, not deleted—they can be reopened if context changes.
+**Key rule:** The agent recommends disqualification with reasoning. The opportunity owner confirms or overrides. Disqualified opportunities are archived with the reason, not deleted—they can be reopened if context changes.
 
 **Disqualification output:**
 
@@ -308,7 +308,7 @@ what they were trying to accomplish).
 
 **Processing order:** The agent checks for Disqualify and Merge first. Only if neither applies does it assess the tier (Light / Standard / Full).
 
-**Human decision:** The agent recommends an outcome. The PM confirms or overrides.
+**Human decision:** The agent recommends an outcome. The opportunity owner confirms or overrides.
 
 ---
 
@@ -323,8 +323,8 @@ what they were trying to accomplish).
 - Solution is obvious or constrained
 
 **What happens:**
-1. PM reviews triage output
-2. PM completes the `intent.md` if needed (constraints, non-goals, scope fence)
+1. Opportunity owner reviews triage output
+2. Intent author completes the `intent.md` if needed (constraints, non-goals, scope fence)
 3. Opportunity moves to prioritization backlog
 
 **Artifact:** Completed lightweight `intent.md`:
@@ -356,7 +356,7 @@ what they were trying to accomplish).
 <Simple: "X customers use it within 30 days" or specific outcome>
 
 ## Approval
-- PM: <name, date>
+- Approved by: <name, date>
 ```
 
 ---
@@ -373,7 +373,7 @@ what they were trying to accomplish).
 
 ### 7.1 Discovery Activities
 
-The PM selects which activities are needed based on what's uncertain:
+The opportunity owner selects which activities are needed based on what's uncertain:
 
 | Activity | When to use | Output |
 |----------|-------------|--------|
@@ -407,7 +407,7 @@ For opportunities with significant uncertainty or strategic importance:
   3. Negative space and churn check
   4. Temporal window analysis
 - Prototypes must stay disposable (sandbox, time-boxed)
-- PM writes core of `intent.md` personally
+- Intent author writes core of `intent.md` personally (not delegated to agents)
 
 **Artifact:** Full `intent.md` with:
 - Discovery evidence section
@@ -428,9 +428,9 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 
 ## 8. Stage 4: Prioritize
 
-**What:** PM / PO decides which opportunities with completed `intent.md` go to implementation.
+**What:** Decide which opportunities with completed `intent.md` go to implementation.
 
-**Who:** Product Manager / Product Owner, with input from the product trio.
+**Who:** Org-dependent. May be a product manager, product owner, team, or leadership group.
 
 **Inputs:**
 - Curated opportunities (from Light tier or after Plan)
@@ -447,9 +447,9 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 
 **Output:** Accepted `intent.md` → enters SDLC
 
-**Gate:** PM accepts the `intent.md`. High-risk intents also need:
-- Tech lead sign-off (feasibility risk)
-- Policy owner sign-off (viability risk flagged)
+**Gate:** Opportunity owner accepts the `intent.md`. High-risk intents also need:
+- Feasibility assessor sign-off (if feasibility risk flagged)
+- Viability assessor sign-off (if viability risk flagged)
 
 ---
 
@@ -470,8 +470,8 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 
 | Stage | Agent does | Human owns |
 |-------|------------|------------|
-| **Capture** | May draft from signal, structures the opportunity | Decides to create, owns the opportunity |
-| **Triage** | Assesses clarity, scans risks, searches evidence, finds matches, checks for prior rejections, recommends disqualification when warranted | Reviews assessment, confirms or overrides outcome (including disqualification) |
+| **Capture** | May draft from signal, structures the opportunity | Decides to create, assigns ownership |
+| **Triage** | Assesses clarity, scans risks, searches evidence, finds matches, checks for prior rejections, recommends outcome | Reviews assessment, confirms or overrides outcome |
 | **Plan** | Prepares interview briefs, drafts guides, finds evidence, scaffolds prototypes | Conducts interviews, makes judgment calls, writes core intent |
 | **Prioritize** | May score/rank based on criteria | Makes the prioritization decision |
 
@@ -480,18 +480,106 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 - Move to Curated (problem validated)
 - Accept `intent.md` (enters SDLC)
 - Reopen a disqualified opportunity
+- Prioritization decisions
+
+See §11 for how responsibilities are assigned flexibly across people.
 
 ---
 
-## 11. Roles
+## 11. Responsibilities
 
-| Role | Responsibilities |
-|------|------------------|
-| **Product Manager** | Owns opportunities, reviews triage, confirms disqualifications or overrides, decides tier, conducts customer conversations, writes intent, prioritizes |
-| **Product Designer** | Owns usability risk, observes users, creates prototypes |
-| **Tech Lead** | Owns feasibility risk, reviews technical spikes, co-signs high-risk intents |
-| **Discovery Platform Owner** | Maintains MCP connections, triage agent, skills, evals |
-| **Agents** | Ingest, enrich, assess, search, recommend disqualification, draft. **Never make final decisions on disqualification, tier, or intent acceptance.** |
+Traditional role boundaries (PM, Designer, Engineer) are fluid. What matters is that the responsibilities below are fulfilled—by whoever has the skills and context to do them well.
+
+### 11.1 Responsibilities That Must Be Assigned
+
+Each opportunity needs clear ownership of these responsibilities. One person may hold several; responsibilities may shift as the opportunity moves through stages.
+
+| Responsibility | What it means | Typical owner | Required capability |
+|----------------|---------------|---------------|---------------------|
+| **Opportunity owner** | Accountable for moving the opportunity through discovery. Makes triage decisions, ensures work happens, signs off on intent. | Whoever captures it, or explicitly assigned | Decision authority, context on the problem |
+| **Customer contact** | Talks to actual customers. Takes own notes. Cannot be delegated to agents. | Anyone with access and conversation skills | Customer access, listening skills |
+| **Value assessment** | Judges whether customers want this and whether it matters to the business | Anyone with customer/market understanding | Customer empathy, business context |
+| **Usability assessment** | Judges whether users can figure it out and whether it fits their workflow | Anyone with UX sensibility | User observation skills, design judgment |
+| **Feasibility assessment** | Judges whether we can build it, at what cost, with what risks | Anyone with technical understanding | System knowledge, engineering judgment |
+| **Viability assessment** | Judges business model fit, compliance, legal, pricing implications | Anyone with business/policy context | Policy knowledge, stakeholder access |
+| **Intent author** | Writes the core of `intent.md`: problem, outcome, constraints, non-goals | Opportunity owner (usually) | Writing clarity, problem understanding |
+| **Prioritization decision** | Decides which opportunities get built next | Org-dependent (may be PM, may be team, may be leadership) | Strategic context, capacity visibility |
+| **Platform maintenance** | Maintains MCP connections, triage agent, skills, evals | Assigned per org | Technical skills, agent tuning |
+
+### 11.2 How Responsibilities Flow
+
+```
+Opportunity created
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│  OPPORTUNITY OWNER assigned (or defaults to creator)        │
+│  → Responsible for triage decision, moving through stages   │
+└─────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│  RISK ASSESSORS engaged as needed                           │
+│  → Value, Usability, Feasibility, Viability                 │
+│  → May be same person, may be different people              │
+│  → Triage agent suggests which risks need human assessment  │
+└─────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│  CUSTOMER CONTACT happens (Plan stage)                      │
+│  → Opportunity owner may do it, or assign to someone closer │
+│  → Must be a human, must take own notes                     │
+└─────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│  INTENT AUTHOR writes intent.md                             │
+│  → Usually opportunity owner                                │
+│  → Could be delegated if someone else has better context    │
+└─────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────────────────────────────────────┐
+│  PRIORITIZATION DECISION made                               │
+│  → Org-specific: PM, product council, team, leadership      │
+│  → Uses input from all risk assessors                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 11.3 What Agents Do (and Don't Do)
+
+Agents handle:
+- Ingesting and enriching signals
+- Assessing problem clarity
+- Scanning for risks and flagging unknowns
+- Searching for evidence
+- Finding related/prior opportunities
+- Recommending triage outcomes
+- Drafting artifacts (briefs, guides, intent sections)
+- Preparing context for human decisions
+
+Agents **never**:
+- Make triage decisions (disqualify, tier, merge)
+- Accept or reject opportunities
+- Approve intent.md
+- Replace customer conversations
+- Make prioritization decisions
+
+### 11.4 Flexibility Principle
+
+The goal is **coverage, not titles**. An organization might:
+- Have engineers own opportunities in their domain
+- Have PMs create prototypes
+- Have designers write intent.md
+- Have a rotating "discovery lead" responsibility
+- Have cross-functional pairs share opportunity ownership
+
+What matters:
+1. Every opportunity has a clear owner
+2. All four risk types get assessed (by someone qualified)
+3. Customer contact happens (by a human)
+4. Decisions are made and recorded
 
 ---
 
@@ -515,15 +603,15 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 | Anti-pattern | Why it fails | Guardrail |
 |--------------|--------------|-----------|
 | **Everything goes through Full discovery** | Slows down clear requests, wastes effort | Triage agent + tier system |
-| **Everything goes Light** | Skips validation on uncertain bets | Triage must flag unknowns; PM accountable for tier choice |
-| **Over-disqualifying** | Good ideas get killed by lazy pattern matching | Disqualify needs clear reasoning; PM reviews all disqualifications |
+| **Everything goes Light** | Skips validation on uncertain bets | Triage must flag unknowns; opportunity owner accountable for tier choice |
+| **Over-disqualifying** | Good ideas get killed by lazy pattern matching | Disqualify needs clear reasoning; opportunity owner reviews all disqualifications |
 | **Under-disqualifying** | Same rejected ideas keep coming back, wasting triage effort | Agent checks prior rejections; reasoning must be recorded |
 | **Disqualifying without recording why** | Can't learn, can't reopen appropriately | Disqualification requires linked reasoning |
 | **Synthetic users as validation** | No real-world friction, sycophancy | Never valid as evidence |
 | **Agent decides tier** | Removes human judgment | Agent recommends, human decides |
 | **Prototypes become production** | No security, observability | Sandbox + time-box |
 | **Skip triage for "urgent" requests** | Creates invisible risk | All opportunities go through triage |
-| **PM doesn't talk to customers** | Loses intuition | PM attends interviews in Plan stage |
+| **No one talks to customers** | Loses intuition, relies on secondhand data | Customer contact responsibility must be assigned and fulfilled |
 
 ---
 
