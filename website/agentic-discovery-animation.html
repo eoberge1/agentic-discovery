@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agentic Discovery Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one left-to-right flow (sources → capture → triage → route → prioritize/SDLC); stacks vertically on phones.
+   Agent work is blue, human decisions are amber. Swap these tokens for the ProductSense brand. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #142030;
+  --muted: #5c6878;
+  --line: #d3dae3;
+  --agent: #3346c8;
+  --agent-soft: #e7eafb;
+  --human: #b86a00;
+  --human-soft: #fbf0df;
+  --ok: #1d7f55;
+  --ok-soft: #e1f3ea;
+  --stop: #b93a35;
+  --stop-soft: #fae6e4;
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1520; --surface: #182130; --ink: #e8edf4; --muted: #96a3b4; --line: #2c3a4e;
+    --agent: #8d9cff; --agent-soft: #232c52; --human: #f0a646; --human-soft: #3a2a12;
+    --ok: #4cc58d; --ok-soft: #143326; --stop: #f07a72; --stop-soft: #3d1c1b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1520; --surface: #182130; --ink: #e8edf4; --muted: #96a3b4; --line: #2c3a4e;
+  --agent: #8d9cff; --agent-soft: #232c52; --human: #f0a646; --human-soft: #3a2a12;
+  --ok: #4cc58d; --ok-soft: #143326; --stop: #f07a72; --stop-soft: #3d1c1b;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 14px/1.5 var(--font-body);
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-block: 32px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 24px;
+}
+.bare .head { display: none; }
+
+.head { display: grid; gap: 8px; max-width: 62ch; }
+.eyebrow {
+  margin: 0; font: 600 12px/1 var(--font-body);
+  letter-spacing: .08em; text-transform: uppercase; color: var(--agent);
+}
+h1 {
+  margin: 0; font: 700 clamp(26px, 3.4vw, 38px)/1.1 var(--font-display);
+  letter-spacing: -.015em; text-wrap: balance;
+}
+.lede { margin: 0; color: var(--muted); font-size: 16px; }
+
+/* ---------- stage ---------- */
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(118px, .8fr) minmax(128px, .9fr) minmax(220px, 1.45fr) minmax(180px, 1.2fr) minmax(170px, 1.1fr);
+  column-gap: clamp(22px, 3vw, 46px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 26px clamp(16px, 2.4vw, 30px) 30px;
+}
+.wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.wires path { fill: none; stroke: var(--line); stroke-width: 1.5; transition: stroke .3s; }
+.wires path.on { stroke: var(--agent); stroke-width: 2; stroke-dasharray: 6 5; animation: flow .7s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -11; } }
+
+.col {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  padding-top: 30px; min-width: 0;
+}
+.col-label {
+  position: absolute; top: 0; left: 0;
+  font: 600 11px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  white-space: nowrap;
+}
+
+.node {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: border-color .3s, box-shadow .3s, background .3s;
+}
+.node b { display: block; font-weight: 600; font-size: 14px; line-height: 1.25; }
+.node small { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; }
+.node.active { border-color: var(--agent); box-shadow: 0 0 0 4px var(--agent-soft); }
+.node.human.active { border-color: var(--human); box-shadow: 0 0 0 4px var(--human-soft); }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+
+.src { padding: 7px 10px; font-weight: 500; font-size: 13px; border-radius: 999px; text-align: center; }
+.src.active { background: var(--agent-soft); }
+
+.big { padding-top: 18px; }
+.role {
+  display: inline-block; margin-bottom: 8px;
+  font: 600 10.5px/1 var(--font-body); letter-spacing: .06em; text-transform: uppercase;
+  padding: 4px 7px; border-radius: 5px;
+}
+.role-agent { background: var(--agent); color: var(--surface); }
+.role-human { background: var(--human); color: var(--surface); }
+
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.checks li {
+  display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: baseline;
+  font-size: 12.5px; color: var(--muted);
+}
+.checks li span::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--line); margin-right: 7px; vertical-align: 1px; transition: background .25s;
+}
+.checks em {
+  font: 500 11.5px/1.3 var(--font-mono); font-style: normal; text-align: right; color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.checks li.scan span::before { background: var(--agent); animation: blink .35s ease-in-out infinite alternate; }
+@keyframes blink { to { opacity: .25; } }
+.checks li.ok span::before { background: var(--ok); }
+.checks li.ok em { color: var(--ok); }
+.checks li.warn span::before { background: var(--human); }
+.checks li.warn em { color: var(--human); }
+.checks li.stop span::before { background: var(--stop); }
+.checks li.stop em { color: var(--stop); }
+.checks li.ok span, .checks li.warn span, .checks li.stop span, .checks li.mute span { color: var(--ink); }
+
+.verdict {
+  margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line);
+  display: grid; gap: 6px; font-size: 12.5px; min-height: 58px;
+}
+.verdict > div { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; opacity: .35; transition: opacity .3s; }
+.verdict > div.show { opacity: 1; }
+.chip {
+  font: 600 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em;
+  padding: 4px 7px; border-radius: 5px; background: var(--agent-soft); color: var(--agent);
+}
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.stop { background: var(--stop-soft); color: var(--stop); }
+.chip.merge { background: var(--bg); color: var(--muted); }
+.who { font-weight: 600; }
+.who.agent { color: var(--agent); }
+.who.human { color: var(--human); }
+
+.out { padding-top: 20px; }
+.out .count {
+  position: absolute; bottom: 9px; right: 10px;
+  font: 500 11px/1 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.out.stop.active { border-color: var(--stop); box-shadow: 0 0 0 4px var(--stop-soft); }
+.out.ok.active { border-color: var(--ok); box-shadow: 0 0 0 4px var(--ok-soft); }
+.out.merge.active { border-color: var(--muted); box-shadow: 0 0 0 4px var(--bg); }
+.acts { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.acts span {
+  font-size: 11px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line); color: var(--muted);
+  transition: all .25s;
+}
+.acts span.on { background: var(--human-soft); border-color: var(--human); color: var(--ink); }
+
+.doc {
+  margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--bg);
+}
+.stamp {
+  font: 600 10.5px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .05em;
+  color: var(--ok); border: 1.5px solid var(--ok); padding: 3px 5px; border-radius: 4px;
+  transform: rotate(-6deg) scale(.6); opacity: 0; transition: all .3s cubic-bezier(.3, 1.6, .5, 1);
+}
+.stamp.show { opacity: 1; transform: rotate(-6deg) scale(1); }
+.lastcol { gap: 34px; }
+.sdlc { padding-top: 20px; }
+.pipe { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 3px; }
+.pipe li {
+  font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--bg); color: var(--muted);
+  transition: all .2s;
+}
+.pipe li.on { background: var(--agent); color: var(--surface); }
+
+/* ---------- token ---------- */
+.token {
+  position: absolute; left: 0; top: 0; z-index: 5;
+  display: flex; align-items: center; gap: 7px; max-width: 200px;
+  background: var(--ink); color: var(--bg);
+  border-radius: 999px; padding: 5px 10px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  box-shadow: 0 6px 18px -6px rgba(10, 20, 40, .45);
+  opacity: 0; transition: opacity .3s;
+  will-change: transform;
+}
+.token.show { opacity: 1; }
+.token .t-txt { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.token .t-tag {
+  font: 500 10.5px/1 var(--font-mono); background: var(--bg); color: var(--ink);
+  padding: 4px 6px; border-radius: 999px; margin-right: -5px;
+}
+.token .t-tag:empty { display: none; }
+
+/* ---------- caption + controls ---------- */
+.below { display: grid; grid-template-columns: 1fr auto; gap: 16px 28px; align-items: start; }
+.caption { display: grid; gap: 4px; min-height: 64px; min-width: 0; }
+.step { font: 600 12px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .05em; color: var(--agent); }
+.caption p { margin: 0; font-size: 16px; max-width: 62ch; }
+.controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+.controls button {
+  font: 500 12.5px/1 var(--font-body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; cursor: pointer;
+}
+.controls button:hover { border-color: var(--muted); }
+.controls button:focus-visible { outline: 2px solid var(--agent); outline-offset: 2px; }
+.controls button[aria-current="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.scen { display: flex; gap: 6px; flex-wrap: wrap; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 12.5px; }
+.legend span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.legend .l-agent::before { background: var(--agent); }
+.legend .l-human::before { background: var(--human); }
+
+@media (max-width: 820px) {
+  .stage { display: flex; flex-direction: column; gap: 30px; }
+  .sources { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 6px; }
+  .outcomes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .capture-col .node { max-width: 260px; }
+  .below { grid-template-columns: 1fr; }
+  .controls { justify-content: flex-start; }
+  .token { max-width: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wires path.on { animation: none; stroke-dasharray: none; }
+  .checks li.scan span::before { animation: none; }
+  .stamp, .token, .node { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header class="head">
+    <p class="eyebrow">Agentic product discovery</p>
+    <h1>How an idea becomes an intent.md</h1>
+    <p class="lede">An agent triages every signal. Clear requests move fast, uncertain bets get deeper discovery, and people make every call.</p>
+  </header>
+
+  <div class="stage" id="stage" role="img" aria-label="Animated diagram: signals from strategy, PMs, customers, the organization and post-launch learning are captured as opportunities, assessed by a triage agent, then disqualified, merged, curated or sent to discovery. A PM prioritizes, and the accepted intent.md enters the AI-native SDLC.">
+    <svg class="wires" id="wires" aria-hidden="true">
+      <defs>
+        <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 z" style="fill: var(--line); stroke: none"></path>
+        </marker>
+        <marker id="arr-on" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 z" style="fill: var(--agent); stroke: none"></path>
+        </marker>
+      </defs>
+      <g id="wire-g"></g>
+    </svg>
+
+    <div class="col sources">
+      <div class="col-label">Starting points</div>
+      <div class="node src" id="src-strategy">Strategy</div>
+      <div class="node src" id="src-pm">PM idea</div>
+      <div class="node src" id="src-customer">Customer feedback</div>
+      <div class="node src" id="src-org">Sales &amp; support</div>
+      <div class="node src" id="src-post">Post-launch</div>
+    </div>
+
+    <div class="col capture-col">
+      <div class="col-label">1 · Capture</div>
+      <div class="node big" id="capture">
+        <b>Opportunity</b>
+        <small>Anyone can add one</small>
+        <div class="doc"><span class="mono">intent.md</span><small>draft</small></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-label">2 · Triage</div>
+      <div class="node big" id="triage">
+        <span class="role role-agent">Triage agent</span>
+        <ul class="checks" id="checks">
+          <li><span>Problem clarity</span><em>–</em></li>
+          <li><span>Risk scan</span><em>–</em></li>
+          <li><span>Evidence</span><em>–</em></li>
+          <li><span>Earlier decisions</span><em>–</em></li>
+        </ul>
+        <div class="verdict">
+          <div id="v-agent"><span class="who agent">Agent recommends</span><span class="chip" id="v-chip">–</span></div>
+          <div id="v-human"><span class="who human">PM confirms</span><span id="v-human-txt">or overrides</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col outcomes">
+      <div class="col-label">Route</div>
+      <div class="node out stop" id="out-disq"><b>Disqualify</b><small>Archived with reason</small><span class="count" id="c-disq">0</span></div>
+      <div class="node out merge" id="out-merge"><b>Merge</b><small>Added to an existing opportunity</small><span class="count" id="c-merge">0</span></div>
+      <div class="node out" id="out-plan">
+        <b>3b · Plan</b><small>Standard or Full tier</small>
+        <div class="acts" id="acts">
+          <span data-a="interviews">Interviews</span><span data-a="prototype">Prototype</span><span data-a="spike">Tech spike</span><span data-a="test">Assumption test</span>
+        </div>
+      </div>
+      <div class="node out ok" id="out-curated"><b>3a · Curated</b><small>Light tier, ready to prioritize</small><span class="count" id="c-cur">0</span></div>
+    </div>
+
+    <div class="col lastcol">
+      <div class="col-label">4 · Prioritize</div>
+      <div class="node big human" id="prio">
+        <span class="role role-human">PM / PO decides</span>
+        <small>Evidence, impact, effort, strategic fit</small>
+        <div class="doc"><span class="mono">intent.md</span><span class="stamp" id="stamp">Accepted</span></div>
+      </div>
+      <div class="node sdlc" id="sdlc">
+        <b>AI-native SDLC</b>
+        <small class="mono" id="c-ship">0 shipped</small>
+        <ol class="pipe" id="pipe"><li>Plan</li><li>Design</li><li>Build</li><li>Test</li><li>Deploy</li></ol>
+      </div>
+    </div>
+
+    <div class="token" id="token" aria-hidden="true"><span class="t-txt" id="t-txt"></span><span class="t-tag" id="t-tag"></span></div>
+  </div>
+
+  <div class="below">
+    <div class="caption" aria-live="polite">
+      <span class="step" id="step">Starting point</span>
+      <p id="cap">Signals arrive from strategy, PMs, customers, the organization and post-launch learning.</p>
+    </div>
+    <div class="controls">
+      <div class="scen" id="scen" aria-label="Examples"></div>
+      <button type="button" id="play" aria-pressed="false">Pause</button>
+    </div>
+  </div>
+  <div class="legend"><span class="l-agent">Agents do the research</span><span class="l-human">People decide</span><span>Illustrative examples</span></div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  if (/[?&]bare\b/.test(location.search)) $('wrap').classList.add('bare');
+
+  const SCENARIOS = [
+    { name: 'Clear request', src: 'src-customer', srcLabel: 'Customer feedback', text: 'Excel export for finance',
+      quote: '“I can’t share reports with finance. They only work in Excel.”',
+      checks: [['Clear', 'ok'], ['Low, feasibility open', 'warn'], ['4 customers · $220k ARR', 'ok'], ['Related: #123', 'ok']],
+      out: 'Light', kind: 'ok',
+      reason: 'Clear problem, real evidence, low risk. The agent recommends the Light tier.',
+      path: [{ node: 'out-curated', step: '3a · Curated', cap: 'No extra discovery needed. The PM completes the intent.md and it joins the backlog.', count: 'c-cur' }],
+      ship: true },
+    { name: 'Asked before', src: 'src-customer', srcLabel: 'Customer feedback', text: 'Custom XML export',
+      quote: '“We need exports in a custom XML format for our legacy system.”',
+      checks: [['Clear', 'ok'], ['Not needed', 'mute'], ['Nothing new', 'warn'], ['Rejected #89 · Aug', 'stop']],
+      out: 'Disqualify', kind: 'stop',
+      reason: 'The same ask was rejected in August and nothing has changed. The agent recommends disqualifying it.',
+      path: [{ node: 'out-disq', step: 'Disqualified', cap: 'Archived with the earlier reasoning linked. It can be reopened if the context changes.', count: 'c-disq' }] },
+    { name: 'Already tracked', src: 'src-org', srcLabel: 'Sales', text: 'Audit log export',
+      quote: '“Two prospects asked for audit log export in their security review.”',
+      checks: [['Clear', 'ok'], ['Not needed', 'mute'], ['+2 prospects', 'ok'], ['Match: active #142', 'ok']],
+      out: 'Merge', kind: 'merge',
+      reason: 'An opportunity for this is already in discovery. The agent recommends merging.',
+      path: [{ node: 'out-merge', step: 'Merged', cap: 'Added as evidence to opportunity #142. One opportunity, with more evidence behind it.', count: 'c-merge' }] },
+    { name: 'Strategic bet', src: 'src-strategy', srcLabel: 'Strategy', text: 'Self-serve onboarding',
+      quote: 'OKR: grow mid-market accounts that onboard without sales.',
+      checks: [['Unclear', 'warn'], ['3 unknown', 'stop'], ['Thin', 'warn'], ['None found', 'ok']],
+      out: 'Full', kind: 'plan',
+      reason: 'The problem is unclear and three risks are unknown. The agent recommends full discovery.',
+      path: [
+        { node: 'out-plan', step: '3b · Plan', cap: 'Full discovery. The PM interviews customers, the team prototypes, runs a tech spike and tests assumptions.', acts: ['interviews', 'prototype', 'spike', 'test'] },
+        { node: 'out-curated', step: '3a · Curated', cap: 'Uncertainty is down. The completed intent.md joins the backlog.', count: 'c-cur' }],
+      ship: true },
+    { name: 'Post-launch', src: 'src-post', srcLabel: 'Post-launch learning', text: 'Low SMB adoption',
+      quote: 'Partial hit: SMB accounts aren’t using the new Excel export.',
+      checks: [['Clear', 'ok'], ['Usability unknown', 'warn'], ['6 SMB accounts', 'ok'], ['Shipped: #123', 'ok']],
+      out: 'Standard', kind: 'plan',
+      reason: 'Clear problem with one unknown risk. The agent recommends targeted validation.',
+      path: [
+        { node: 'out-plan', step: '3b · Plan', cap: 'Standard tier: two quick checks, days rather than weeks.', acts: ['interviews', 'prototype'] },
+        { node: 'out-curated', step: '3a · Curated', cap: 'The gap is closed. The intent.md is ready to prioritize.', count: 'c-cur' }],
+      ship: true },
+  ];
+
+  const WIRES = [
+    ...['src-strategy', 'src-pm', 'src-customer', 'src-org', 'src-post'].map(s => [s, 'capture']),
+    ['capture', 'triage'],
+    ['triage', 'out-disq'], ['triage', 'out-merge'], ['triage', 'out-plan'], ['triage', 'out-curated'],
+    ['out-plan', 'out-curated'], ['out-curated', 'prio'], ['prio', 'sdlc'],
+  ];
+
+  const stage = $('stage'), token = $('token'), wireG = $('wire-g');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ABORT = Symbol('abort');
+  let paused = false, runId = 0, anim = null, curNode = null, pos = { x: 0, y: 0 };
+  const counts = { 'c-disq': 0, 'c-merge': 0, 'c-cur': 0, 'c-ship': 0 };
+
+  // ---------- geometry ----------
+  function rel(el) {
+    const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const left = r.left - s.left, top = r.top - s.top;
+    return { left, top, right: left + r.width, bottom: top + r.height, cx: left + r.width / 2, cy: top + r.height / 2 };
+  }
+  function edgePath(a, b) {
+    const A = rel($(a)), B = rel($(b));
+    if (B.left >= A.right - 2) {
+      const dx = (B.left - A.right) / 2;
+      return `M${A.right},${A.cy} C${A.right + dx},${A.cy} ${B.left - dx},${B.cy} ${B.left - 2},${B.cy}`;
+    }
+    if (B.top >= A.bottom - 2) {
+      const dy = (B.top - A.bottom) / 2;
+      return `M${A.cx},${A.bottom} C${A.cx},${A.bottom + dy} ${B.cx},${B.top - dy} ${B.cx},${B.top - 2}`;
+    }
+    return `M${A.cx},${A.cy} L${B.cx},${B.cy}`;
+  }
+  function drawWires() {
+    const on = new Set([...wireG.querySelectorAll('.on')].map(p => p.id));
+    wireG.innerHTML = WIRES.map(([a, b]) => {
+      const id = `w-${a}-${b}`, lit = on.has(id);
+      return `<path id="${id}" class="${lit ? 'on' : ''}" d="${edgePath(a, b)}" marker-end="url(#${lit ? 'arr-on' : 'arr'})"></path>`;
+    }).join('');
+  }
+  function light(a, b) {
+    const p = $(`w-${a}-${b}`);
+    if (p) { p.classList.add('on'); p.setAttribute('marker-end', 'url(#arr-on)'); }
+  }
+  function dock(id, center) {
+    const r = rel($(id));
+    return { x: r.cx, y: center ? r.cy : r.top };
+  }
+  const tf = p => `translate(${p.x}px, ${p.y}px) translate(-50%, -50%)`;
+  function place(p) { pos = p; token.style.transform = tf(p); }
+
+  // ---------- timing (pausable, abortable) ----------
+  function wait(ms, id) {
+    return new Promise((res, rej) => {
+      let left = ms, last = performance.now();
+      const tick = now => {
+        if (id !== runId) return rej(ABORT);
+        if (!paused) left -= now - last;
+        last = now;
+        left <= 0 ? res() : requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+  }
+  async function moveTo(node, id) {
+    const to = dock(node);
+    curNode = node;
+    if (reduce) { place(to); return; }
+    anim = token.animate([{ transform: tf(pos) }, { transform: tf(to) }],
+      { duration: 750, easing: 'cubic-bezier(.65,0,.3,1)', fill: 'forwards' });
+    if (paused) anim.pause();
+    await new Promise((res, rej) => { anim.onfinish = res; anim.oncancel = () => rej(ABORT); });
+    if (id !== runId) throw ABORT;
+    anim.oncancel = null; anim.cancel(); anim = null;
+    place(to);
+  }
+
+  // ---------- UI helpers ----------
+  const caption = (step, text) => { $('step').textContent = step; $('cap').textContent = text; };
+  const activate = id => $(id).classList.add('active');
+  const bump = id => { counts[id]++; $(id).textContent = id === 'c-ship' ? `${counts[id]} shipped` : counts[id]; };
+
+  function reset() {
+    document.querySelectorAll('.node.active').forEach(n => n.classList.remove('active'));
+    wireG.querySelectorAll('.on').forEach(p => { p.classList.remove('on'); p.setAttribute('marker-end', 'url(#arr)'); });
+    document.querySelectorAll('#checks li').forEach(li => { li.className = ''; li.querySelector('em').textContent = '–'; });
+    $('v-agent').classList.remove('show'); $('v-human').classList.remove('show');
+    $('v-chip').className = 'chip'; $('v-chip').textContent = '–';
+    $('v-human-txt').textContent = 'or overrides';
+    $('stamp').classList.remove('show');
+    document.querySelectorAll('#acts span, #pipe li').forEach(e => e.classList.remove('on'));
+    $('t-tag').textContent = '';
+  }
+
+  // ---------- one scenario ----------
+  async function run(s, idx, id) {
+    reset();
+    document.querySelectorAll('#scen button').forEach((b, i) => b.setAttribute('aria-current', i === idx));
+    $('t-txt').textContent = s.text;
+    curNode = s.src;
+    place(dock(s.src, true));
+    token.classList.add('show');
+    activate(s.src);
+    caption(s.srcLabel, s.quote);
+    await wait(1900, id);
+
+    light(s.src, 'capture');
+    await moveTo('capture', id);
+    activate('capture');
+    $('t-tag').textContent = 'draft';
+    caption('1 · Capture', 'It becomes an opportunity with a draft intent.md. Anyone can add one.');
+    await wait(1500, id);
+
+    light('capture', 'triage');
+    await moveTo('triage', id);
+    activate('triage');
+    $('t-tag').textContent = 'triage';
+    caption('2 · Triage', 'The triage agent checks problem clarity, risks, evidence from customer conversations, and earlier decisions.');
+    const lis = document.querySelectorAll('#checks li');
+    for (let i = 0; i < lis.length; i++) {
+      lis[i].className = 'scan';
+      await wait(520, id);
+      lis[i].className = s.checks[i][1];
+      lis[i].querySelector('em').textContent = s.checks[i][0];
+      await wait(260, id);
+    }
+    $('v-chip').textContent = s.out;
+    $('v-chip').className = `chip ${s.kind}`;
+    $('v-agent').classList.add('show');
+    $('t-tag').textContent = s.out.toLowerCase();
+    caption('2 · Triage', s.reason);
+    await wait(2300, id);
+
+    $('v-human').classList.add('show');
+    $('v-human-txt').textContent = '✓ confirmed';
+    caption('2 · Triage', 'The PM confirms or overrides. The agent recommends; it never makes the final call.');
+    await wait(1700, id);
+
+    let prev = 'triage';
+    for (const p of s.path) {
+      light(prev, p.node);
+      await moveTo(p.node, id);
+      activate(p.node);
+      caption(p.step, p.cap);
+      if (p.count) bump(p.count);
+      if (p.acts) {
+        $('t-tag').textContent = 'discovery';
+        await wait(400, id);
+        for (const a of p.acts) {
+          document.querySelector(`#acts [data-a="${a}"]`).classList.add('on');
+          await wait(550, id);
+        }
+      } else if (p.node === 'out-curated') {
+        $('t-tag').textContent = 'ready';
+      }
+      await wait(p.acts ? 1300 : 2300, id);
+      prev = p.node;
+    }
+
+    if (s.ship) {
+      light('out-curated', 'prio');
+      await moveTo('prio', id);
+      activate('prio');
+      caption('4 · Prioritize', 'The PM / PO weighs evidence, impact, effort and fit, and accepts the intent.md.');
+      await wait(1400, id);
+      $('stamp').classList.add('show');
+      $('t-tag').textContent = 'accepted';
+      await wait(1300, id);
+
+      light('prio', 'sdlc');
+      await moveTo('sdlc', id);
+      activate('sdlc');
+      caption('AI-native SDLC', 'Only an accepted intent.md enters the SDLC. After launch, what we learn flows back into discovery.');
+      for (const li of document.querySelectorAll('#pipe li')) { li.classList.add('on'); await wait(260, id); }
+      bump('c-ship');
+      await wait(1900, id);
+    } else {
+      await wait(600, id);
+    }
+    token.classList.remove('show');
+    await wait(500, id);
+  }
+
+  async function loop(start) {
+    const id = ++runId;
+    if (anim) anim.cancel();
+    let i = start;
+    try {
+      for (;;) { await run(SCENARIOS[i], i, id); i = (i + 1) % SCENARIOS.length; }
+    } catch (e) { if (e !== ABORT) throw e; }
+  }
+
+  // ---------- controls ----------
+  $('scen').innerHTML = SCENARIOS.map((s, i) => `<button type="button" data-i="${i}">${s.name}</button>`).join('');
+  $('scen').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (b) loop(+b.dataset.i);
+  });
+  $('play').addEventListener('click', () => {
+    paused = !paused;
+    $('play').textContent = paused ? 'Play' : 'Pause';
+    $('play').setAttribute('aria-pressed', paused);
+    if (anim) paused ? anim.pause() : anim.play();
+  });
+
+  const relayout = () => { drawWires(); if (curNode && !anim) place(dock(curNode, curNode.startsWith('src-'))); };
+  new ResizeObserver(relayout).observe(stage);
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { drawWires(); loop(0); });
+})();
+</script>
+</body>
+</html>
