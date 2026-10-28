@@ -8,18 +8,19 @@ A complete run on a fictional tenant (Northstar Reports, a B2B reporting product
 
 ## What the skill did (summarized)
 
-1. `getDiscoveryContext` → non-goals include "No on-premise or self-hosted deployment." and "No per-customer custom export formats"; strategic bet "Regulated industries"; segments enterprise / mid-market / SMB; no threshold overrides; contract version 1.
+1. `getDiscoveryContext` → non-goals include "No on-premise or self-hosted deployment." and "No per-customer custom export formats"; strategic bet "Regulated industries"; segments enterprise / mid-market / SMB; no threshold overrides; contract version 2.
 2. `listSignals(status: "open", since: 2026-10-21)` → 14 signals, total 14. Under the cap. Two older open signals (302, 305) sit outside the window; they surface later as evidence.
-3. For each signal: kind check, then `getSignal`, `getCustomer` (once per customer), `searchOpportunities` (all statuses), `searchSignals` (plus one call with `include_dismissed: true`).
-4. Clustered signals 12, 18 and 23: three asks (version history, change author, fixed-heading templates) from two regulated customers, one driver (quality-system audit trail).
-5. Wrote the proposal. Wrote nothing to ProductSense.
+3. For each signal: kind check, then `getSignal`, `getCustomer` (once per customer), `searchOpportunities(like_signal_id)` (all statuses) and one `searchSignals(like_signal_id, include_dismissed: true)`. No text queries were needed per signal: every signal had a stored embedding and none had a content-free verbatim. The search from 31 surfaced the older open signals 302 and 305; the search from 26 surfaced dismissed signal 9.
+4. One `compareSignals` over the 14 ids proposed 12–18 as a pair. Signal 23 (fixed-heading templates) scored low against both and joined on its normalized problem: same regulated customers, same quality-system driver. Then one `searchSignals` and one `searchOpportunities` with that driver as the `query`.
+5. Clustered signals 12, 18 and 23: three asks (version history, change author, fixed-heading templates) from two regulated customers, one driver (quality-system audit trail).
+6. Wrote the proposal. Wrote nothing to ProductSense.
 
 ## Proposal
 
 ```markdown
 ## Triage proposal: 14 open signals, 2026-10-21 to 2026-10-28
 
-- Contract: skill expects v1; server reports v1.
+- Contract: skill expects v2; server reports v2.
 - Older open signals 302 and 305 (outside the window) were used as evidence for B, not re-triaged.
 
 ### Create opportunities (4)

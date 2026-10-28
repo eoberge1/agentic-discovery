@@ -11,7 +11,7 @@ Earlier in this conversation you triaged the past 7 days and presented this prop
 
 ## Triage proposal: 14 open signals, 2026-10-21 to 2026-10-28
 
-- Contract: skill expects v1; server reports v1.
+- Contract: skill expects v2; server reports v2.
 - Older open signals 302 and 305 (outside the window) were used as evidence for B, not re-triaged.
 
 ### Create opportunities (4)

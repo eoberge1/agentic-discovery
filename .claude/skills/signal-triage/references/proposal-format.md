@@ -11,10 +11,11 @@ Use this shape every run. Fixed order of groups, one line per signal or cluster,
 
 <Header notes, only when they apply:>
 - Assessed 25 of 83 in the window (cap exceeded by 2 to finish one call); say "continue" for the next 25.
-- Contract: skill expects v1; server reports <version | unknown>.
+- Contract: skill expects v2; server reports <version | unknown>.
 - No discovery context available: out-of-scope and strategic-bet checks skipped.
 - Signal status unavailable: linked or dismissed signals could not be excluded.
 - searchOpportunities failed: merge and prior-rejection checks not run.
+- Similarity search from stored items unavailable: searched by normalized problem text instead.
 
 ### Create opportunities (<n>)
 - **A. "<title>"** · signals <ids> · <customers> customers, ARR <$ or "unknown"> (<n> missing) · **<TIER>** <(clear | borderline)>: <one-line reasoning> · needs: <activities or assessors>
@@ -106,7 +107,7 @@ Stored on every created opportunity via `createOpportunity.triage.record`. The `
 ```json
 {
   "skill_version": "1.0.0",
-  "contract_version": "1",
+  "contract_version": "2",
   "triaged_at": "2026-10-28T10:00:00Z",
   "signals": ["12", "18", "23"],
   "problem": {

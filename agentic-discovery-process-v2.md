@@ -156,9 +156,11 @@ For a feature request, the agent searches the same customer's other signals for 
 
 #### B. Existing opportunity check
 
+ProductSense stores an embedding for every signal and opportunity, so the agent searches *from the signal itself* ("like this signal") rather than writing a query. That is fast and gives the same neighbours on every run. It falls back to a text query for pasted text, a content-free verbatim, or a restated problem. The similarity score only ranks candidates; the agent reads each hit and decides.
+
 ```
-searchOpportunities (all statuses, incl. rejected / archived / shipped)
-searchSignals (include_dismissed)   → the same ask dismissed earlier
+searchOpportunities (like this signal; all statuses, incl. rejected / archived / shipped)
+searchSignals (like this signal, include_dismissed)   → the same ask dismissed earlier
 ```
 
 Output per hit:
@@ -170,7 +172,7 @@ Output per hit:
 #### C. Evidence search
 
 ```
-searchSignals   → related signals; each row carries its customer (segment, tier, ARR)
+searchSignals   → related signals (the same call as above); each row carries its customer (segment, tier, ARR)
 getCustomer     → tier, ARR, churn status, importance
 ```
 

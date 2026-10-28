@@ -1,8 +1,8 @@
 {
- "_readme": "Complete tenant data for this test. Resolve the contract tools against it: listSignals = signals filtered by status and date; getSignal = one signal; searchSignals = semantically matching signals (include dismissed only when asked); searchOpportunities = semantically matching opportunities across all statuses; getCustomer = customers[id]; getDiscoveryContext = discovery_context (null means the tool is unavailable). Write tools are unavailable.",
+ "_readme": "Complete tenant data for this test. Resolve the contract tools against it: listSignals = signals filtered by status and date; getSignal = one signal; searchSignals = semantically matching signals, from a text query or from a stored signal or opportunity given as like_signal_id / like_opportunity_id (include dismissed only when asked); searchOpportunities = the same over opportunities across all statuses; compareSignals = pairwise similarity between the given signals, judged semantically; getCustomer = customers[id]; getDiscoveryContext = discovery_context (null means the tool is unavailable). Write tools are unavailable.",
  "today": "2026-10-28",
  "discovery_context": {
-  "contract_version": "1",
+  "contract_version": "2",
   "strategy_summary": "Northstar Reports: reporting and spec management for product teams. 2026 focus: win regulated industries.",
   "non_goals": [
    "No on-premise or self-hosted deployment.",

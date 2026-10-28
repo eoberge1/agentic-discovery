@@ -1,4 +1,4 @@
-# signal-triage: contract v1 vs. the current ProductSense MCP
+# signal-triage: contract v2 vs. the current ProductSense MCP
 
 **Date:** 2026-10-28 (updated after the live dry run; see `signal-triage-dryrun-2026-10-28.md`)
 **Purpose:** engineering handoff. What the `signal-triage` skill needs (`.claude/skills/signal-triage/references/mcp-contract.md`) versus what the ProductSense MCP exposes today, ranked by what blocks the skill. The last section is an interim mapping so the skill can be dry-run read-only before any server work.
@@ -12,21 +12,23 @@ Vocabulary: the contract says **signal**; the current MCP calls the same thing a
 | `getDiscoveryContext` | none; `listKnowledgeBasePages` + `getKnowledgeBasePage` could hold a page by convention | partial | no structured non-goals, segments, ARR bands, thresholds, status classes |
 | `listSignals(status: open, since)` | `searchInsights(startDate, endDate)` with no term | partial | **no signal status**. Nothing says whether an insight is already linked to an opportunity or was dismissed, so "open" cannot be computed |
 | `getSignal(id)` | none; `searchInsights` rows carry `quote`, `note`, `customer`, `date`, `tags`, link | partial | no single fetch; no `source_type`, `status`, `linked_opportunity_ids`, `dismissal`, full `verbatim` beyond `quote` |
-| `searchSignals(query, customer_id, include_dismissed)` | `searchInsights(searchTerm, selectedCustomers, dates)`; `findEvidence(specification)` | partial | **`searchInsights` is keyword matching, confirmed in the 2026-10-28 dry run** (long phrasings return 0; single tokens browse); rows lack `segment`, `tier`, linked opportunities, dismissal. `findEvidence` is semantic and strong but ~1 min per call, markdown only, one idea per call: usable for a cluster, too slow per signal |
-| `searchOpportunities(query, statuses: all)` | `listOpportunities` (index, paged 100, no search) + `getOpportunity` for bodies | weak | **no search, no decision reasoning**. Rejections are at best `ICEBOX` with reasoning somewhere in the HTML notes; the prior-rejection check needs reasoning as a field |
+| `searchSignals(query \| like_signal_id \| like_opportunity_id, customer_id, include_dismissed)` | `searchInsights(searchTerm, selectedCustomers, dates)`; `findEvidence(specification)` | partial | **`searchInsights` is keyword matching, confirmed in the 2026-10-28 dry run** (long phrasings return 0; single tokens browse); rows lack `segment`, `tier`, linked opportunities, dismissal. `findEvidence` is semantic and strong but ~1 min per call, markdown only, one idea per call: usable for a cluster, too slow per signal |
+| `searchOpportunities(query \| like_signal_id \| like_opportunity_id, statuses: all)` | `listOpportunities` (index, paged 100, no search) + `getOpportunity` for bodies | weak | **no search, no decision reasoning**. Rejections are at best `ICEBOX` with reasoning somewhere in the HTML notes; the prior-rejection check needs reasoning as a field |
 | `getCustomer(id)` | `getCustomerDetails` (name, domain, stage, importance, agentSummary); ARR only appears as `customer.value` on insight rows; churn only via `listChurnSignals` (by window, not by customer) | partial | no ARR, segment, tier or churn risk on the customer object |
 | `createOpportunity(signal_ids, tier, triage)` | `createOpportunity(title, notes, status, insightIds, impact, effort)` | good | `insightIds` link as CONFIRMED (fine after human confirmation). No `tier` field; map to `status`. No structured `triage` field; the record goes into `notes` HTML |
 | `linkSignalToOpportunity(signal_id, opportunity_id, relation, note)` | none; `updateOpportunity` has no `insightIds` | **missing** | the "new evidence" outcome cannot be written |
 | `dismissSignal(signal_id, reason_type, reason)` | none | **missing** | the "disqualify" outcome cannot be written, and nothing remembers it next run |
+| `compareSignals(signal_ids)` (optional) | none | missing | clustering falls back to each signal's own neighbours |
 
 ## 2. Gaps ranked by what they block
 
 1. **Signal status and dismissal (`dismissSignal`, `status` on signals, `listSignals(status: open)`).** Without it the skill cannot select "open" signals and cannot record a disqualification. Every run re-triages the same signals and the "previously rejected" check has no memory. This is the one new concept the server needs: a dismissal record on an insight (reason type, reason text, related opportunity, user, time).
 2. **Link a signal to an existing opportunity (`linkSignalToOpportunity`).** Today `insightIds` exists only on create. The merge outcome needs it on update, with a `relation` (supporting / adjacent) and a note.
-3. **Opportunity search with decision reasoning (`searchOpportunities`).** Semantic search over title + problem across all statuses, returning a `decision { outcome, reasoning, decided_by, at }`. Needs a decision field on opportunities; today a rejection is `ICEBOX` plus free text.
-4. **Customer enrichment on `getCustomer`.** ARR (the `value` already on insight rows), segment, tier, churn risk. Segment and tier may not exist as data yet; the skill treats them as `unknown` if null, so this is about exposing what exists.
-5. **`searchSignals` row shape.** Inline `customer` with ARR already exists. Add `linked_opportunity_ids`, `dismissal`, `source_type`, and make the search semantic (or confirm it already is).
-6. **`getDiscoveryContext`.** Lowest urgency: the skill degrades honestly without it. Interim convention: one knowledge base page titled "Discovery context" with headed sections (Non-goals, Strategic bets, Segments, Thresholds).
+3. **Similarity search from stored embeddings (contract v2).** ProductSense already stores an embedding for every insight and opportunity. Expose it: `searchSignals` and `searchOpportunities` accept `like_signal_id` / `like_opportunity_id` and return nearest neighbours from the vector index, with `similarity` on each row and `embedded_on` on each signal. This replaces the slow `findEvidence` path (about 1 minute per call in the dry run) and the keyword-only `searchInsights`, and makes the per-signal searches cheap enough to run on all 25 signals. Optional: `compareSignals(ids)` returns pairwise similarity for a window in one call. Embed insights on the extracted problem, not the raw quote, and re-embed on edit.
+4. **Opportunity search with decision reasoning (`searchOpportunities`).** Semantic search over title + problem across all statuses, returning a `decision { outcome, reasoning, decided_by, at }`. Needs a decision field on opportunities; today a rejection is `ICEBOX` plus free text.
+5. **Customer enrichment on `getCustomer`.** ARR (the `value` already on insight rows), segment, tier, churn risk. Segment and tier may not exist as data yet; the skill treats them as `unknown` if null, so this is about exposing what exists.
+6. **`searchSignals` row shape.** Inline `customer` with ARR already exists. Add `linked_opportunity_ids`, `dismissal`, `source_type`, and make the search semantic (or confirm it already is).
+7. **`getDiscoveryContext`.** Lowest urgency: the skill degrades honestly without it. Interim convention: one knowledge base page titled "Discovery context" with headed sections (Non-goals, Strategic bets, Segments, Thresholds).
 
 ## 3. Decisions for the ProductSense side
 
@@ -38,6 +40,8 @@ Vocabulary: the contract says **signal**; the current MCP calls the same thing a
 | D | What counts as "rejected"? | A decision reasoning text on the opportunity. `ICEBOX` alone is **parked**: related only, never a merge target, never a rejection basis (contract status class `parked`). No ICEBOX item read in the dry run carried reasoning, so "previously rejected" cannot fire on this tenant until a decision field exists. |
 | E | Is `searchInsights` semantic? | No (dry run, 2026-10-28). Expose a semantic variant or make `searchInsights` semantic; the prior-rejection and clustering checks depend on finding "version history" from "audit trail". |
 | F | ARR is null on every insight row in the dry-run window | Either the CRM sync is not populating `value` or the accounts are unrated. Until fixed, every Value rating is evidence-count only and the skill reports "ARR missing for N of N". |
+| G | What text is an insight embedded on? | The extracted problem (`note`) when present, else the quote. Return it as `embedded_on`, so the skill knows when to fall back to a text query. |
+| H | Is `similarity` comparable across tenants or models? | No need. The skill only ranks by it. If the embedding model changes, re-embed the tenant in one go, so scores within a tenant stay comparable. |
 
 ## 4. Interim mapping for a read-only dry run
 

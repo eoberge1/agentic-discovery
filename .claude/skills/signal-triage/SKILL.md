@@ -36,6 +36,15 @@ Cap a run at 25 signals unless the user asks for more. Each signal costs several
 
 Fetch context once per run (`getDiscoveryContext`) and once per distinct customer (`getCustomer`), not once per signal.
 
+### How to search
+
+ProductSense stores an embedding for every signal and opportunity, so the search tools can start from a stored item: `like_signal_id: <id>` returns its nearest neighbours without you writing a query. Use that by default; it is fast, and the same signal gets the same neighbours on every run. Use a text `query` instead when:
+- the input is pasted text (there is no stored item), or the signal has no stored embedding
+- the embedding was computed on a content-free verbatim (`embedded_on: "verbatim"` and the verbatim says nothing on its own)
+- your normalized problem differs from what was embedded: an inferred problem from Step 3, or a cluster's shared driver
+
+When in doubt, run both and merge the results. A similarity score ranks candidates; it does not decide anything. Read every hit you use and judge it yourself: a 0.92 can be a different problem in the same words, and a 0.70 can be the same problem in other words.
+
 ## 2. Assess each signal
 
 Run these steps for every signal in the same order. The order matters: the kind check stops non-asks early, Disqualify and Merge are checked before tiering, and tiering uses the evidence and risk findings.
@@ -53,19 +62,19 @@ Everything that is not a product ask goes to the "Route elsewhere" group with on
 
 **Step 3. Clarity.** Rate `clear`, `needs-clarification` or `vague`.
 - A clear problem names the situation and the consequence: "I can't share reports with finance because they only work in Excel."
-- A feature request names a solution without the why: "add CSV export". If the only sensible why is obvious from the ask itself ("pin favourite reports" means finding them faster), state it and rate the clarity `clear (self-evident)`. Otherwise search this customer's other signals, including the rest of the same conversation, for the underlying problem (`searchSignals` with `customer_id`); if you find it, restate the problem and mark the clarity as inferred from that signal. Reserve `needs-clarification` for asks that could serve several different problems ("add a share button": share with whom, and what breaks today?). A proposal with a dozen clarification questions for one-line asks helps nobody.
+- A feature request names a solution without the why: "add CSV export". If the only sensible why is obvious from the ask itself ("pin favourite reports" means finding them faster), state it and rate the clarity `clear (self-evident)`. Otherwise search this customer's other signals, including the rest of the same conversation, for the underlying problem (`searchSignals` with `like_signal_id` and `customer_id`); if you find it, restate the problem and mark the clarity as inferred from that signal. Reserve `needs-clarification` for asks that could serve several different problems ("add a share button": share with whom, and what breaks today?). A proposal with a dozen clarification questions for one-line asks helps nobody.
 - A vague signal has neither situation nor ask: "reporting is hard". Record the concrete questions a human would have to ask.
 
-**Step 4. Existing opportunities.** `searchOpportunities` with the normalized problem across **all** statuses. Classify each relevant hit by the tenant's status classes:
+**Step 4. Existing opportunities.** `searchOpportunities` with `like_signal_id` across **all** statuses, plus a `query` with the normalized problem when the rules under "How to search" call for it. Classify each relevant hit by the tenant's status classes:
 - `duplicate`: same problem, active opportunity → Merge candidate
 - `related`: same area, different problem → mention, do not merge
 - `prior_rejection`: rejected or archived **with reasoning** → Disqualify candidate; keep the reasoning text and date. A rejected or archived item with no reasoning cannot support a disqualification; say so and treat it as related.
 - `parked`: an iceboxed or paused item (neither active nor decided) → related; never a merge target, never a rejection basis
 - `shipped`: the problem is already addressed, by a shipped opportunity or a feature that is in production → post-launch feedback, not a new opportunity, unless the ask goes beyond what shipped
 
-Also `searchSignals` with `include_dismissed: true` to catch the same ask dismissed earlier.
+Also `searchSignals` with `like_signal_id` and `include_dismissed: true`. This one call serves three purposes: dismissed hits catch the same ask dismissed earlier, linked and open hits are the evidence for Step 5, and open hits inside the window are clustering candidates. Keep its result; do not call again for Step 5.
 
-**Step 5. Evidence.** `searchSignals` for the normalized problem. Split the hits into **supporting** (same problem) and **adjacent** (same area, different problem). Only supporting hits count; adjacent ones are listed so the reader can see what you set aside. Roll up: distinct customers, signal count, first and last mention, ARR total plus "ARR missing for N accounts", segment breakdown using the tenant's definitions, churn signals among those customers, and the two or three strongest quotes. A quote is usable when a tool returned it with an id and a link, whether that is a signal, a feedback item or a transcript. If the evidence contains a promise someone made to a customer, note it; it belongs in the flags.
+**Step 5. Evidence.** From the Step 4 signal search (plus a `query` call if the normalized problem differs from what was embedded), split the hits into **supporting** (same problem) and **adjacent** (same area, different problem). Only supporting hits count; adjacent ones are listed so the reader can see what you set aside. Roll up: distinct customers, signal count, first and last mention, ARR total plus "ARR missing for N accounts", segment breakdown using the tenant's definitions, churn signals among those customers, and the two or three strongest quotes. A quote is usable when a tool returned it with an id and a link, whether that is a signal, a feedback item or a transcript. If the evidence contains a promise someone made to a customer, note it; it belongs in the flags.
 
 **Step 6. Risks.** Rate the four product risks (after Marty Cagan, SVPG, "The Four Big Risks") as `low`, `medium`, `high` or `unknown`, each with a one-line basis. Each risk is a question about the eventual solution, not about the signal:
 
@@ -111,7 +120,7 @@ Record which rule fired and whether the call was clear or borderline. A single-a
 
 ## 3. Cluster
 
-After assessing every signal, group the ones whose normalized problem is the same and that have no existing opportunity. Each group becomes **one** proposed opportunity with all its signals as evidence; recompute the evidence roll-up across the group. Group also by driver, not just by feature: two different asks from one regulatory need are one opportunity named after the need. Without this step a busy week produces five proposals for one problem.
+After assessing every signal, group the ones whose normalized problem is the same and that have no existing opportunity. Find candidates with one `compareSignals` call over the window's ids; if it is unavailable, use the open window signals that appeared in each other's Step 4 neighbours. Candidates are pairs to check, not clusters: confirm each by comparing the normalized problems. Each group becomes **one** proposed opportunity with all its signals as evidence; recompute the evidence roll-up across the group. Group also by driver, not just by feature: two different asks from one regulatory need are one opportunity named after the need. Similarity will often miss these, because the asks use different words; that is why you compare normalized problems too. Once a cluster is formed, run `searchSignals` and `searchOpportunities` once with the cluster's driver as a `query` to pick up evidence and existing opportunities the single signals missed. Without this step a busy week produces five proposals for one problem.
 
 One stop: if the shared driver is a capability the product already has in production, the signals are post-launch feedback on it, not a cluster. Clustering by "they want to centralize customer feedback" would propose building the product itself.
 
