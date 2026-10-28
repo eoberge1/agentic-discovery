@@ -67,16 +67,20 @@ Also `searchSignals` with `include_dismissed: true` to catch the same ask dismis
 
 **Step 5. Evidence.** `searchSignals` for the normalized problem. Split the hits into **supporting** (same problem) and **adjacent** (same area, different problem). Only supporting hits count; adjacent ones are listed so the reader can see what you set aside. Roll up: distinct customers, signal count, first and last mention, ARR total plus "ARR missing for N accounts", segment breakdown using the tenant's definitions, churn signals among those customers, and the two or three strongest quotes. A quote is usable when a tool returned it with an id and a link, whether that is a signal, a feedback item or a transcript. If the evidence contains a promise someone made to a customer, note it; it belongs in the flags.
 
-**Step 6. Risks.** Rate value, usability, feasibility and viability as `low`, `medium`, `high` or `unknown`, each with a one-line basis.
+**Step 6. Risks.** Rate the four product risks (after Marty Cagan, SVPG, "The Four Big Risks") as `low`, `medium`, `high` or `unknown`, each with a one-line basis. Each risk is a question about the eventual solution, not about the signal:
 
-| Risk | Judge on | `unknown` is right when |
-|---|---|---|
-| Value | number of accounts, what they do today to work around it, retention or compliance language, strategic fit. ARR strengthens the case when present; when it is missing for every account, say so under needs-human and judge on the rest. Missing ARR does not make value unknown. | the evidence search could not run |
-| Usability | new interaction pattern vs. existing one, multi-step workflow, new type of user | the solution shape is not visible yet |
-| Feasibility | several systems touched, data model change, unclear scope, dependencies, access or permission model | the ask is not clearly contained; name the question for the feasibility assessor |
-| Viability | pricing, compliance, legal, security, contractual commitments | a regulatory or privacy driver is mentioned but not understood |
+| Risk | The question | Judge on | `unknown` is right when |
+|---|---|---|---|
+| Value | Will customers buy it, or users choose to use it? | what customers already do about the problem (workarounds, time or money spent, tools bought), how many accounts, retention or deal language, strategic fit. Behaviour beats requests: a customer who built a script has shown value; a customer who said "would be nice" has not. ARR strengthens the case when present; when it is missing for every account, say so under needs-human and judge on the rest. Missing ARR does not make value unknown. | the evidence search could not run |
+| Usability | Can users figure out how to use it? | new interaction pattern vs. an existing one, multi-step workflow, a new type of user, a concept users must learn | the solution shape is not visible yet |
+| Feasibility | Can we build it with the time, skills and technology we have? | several systems touched, data model change, unclear scope, dependencies, access or permission model, new technology | the ask is not clearly contained; name the question for the feasibility assessor |
+| Business viability | Does the solution also work for the rest of our business? | pricing and monetization, sales and go-to-market fit, cost to acquire or serve, partner and contractual commitments, legal and compliance, security and privacy, consistency with the brand promise | a regulatory, contractual or pricing driver is mentioned but not understood |
 
-Name which risks need a human assessor and what question that person must answer. This is how the proposal hands work to the right people.
+Value and viability are separate on purpose. Strong customer demand does not settle viability: a feature customers love can still break pricing, a partner contract or compliance. Rate each on its own evidence.
+
+Value and viability are the risks to retire first, and the ones triage can most often see in the signals. Usability and feasibility usually depend on a solution that does not exist yet, so `unknown` is normal for them at triage; say what would resolve it rather than guess.
+
+Name which risks need a human assessor and the question that person must answer. Value and viability typically go to whoever owns the opportunity, usability to someone with design judgment, feasibility to someone with engineering judgment; who that is varies by team, so name the capability, not a job title. This is how the proposal hands work to the right people.
 
 **Step 7. Disqualify, merge or post-launch.** Apply the first matching rule.
 
@@ -96,7 +100,7 @@ A disqualification must point at a concrete artifact. "Feels low value" is not o
 | Tier | Rule |
 |---|---|
 | Light | clarity `clear` · evidence bar met (one customer with context and a verbatim, or two or more distinct customers) · no risk `high` · at most one risk `unknown` · solution obvious |
-| Full | any of: two or more risks `high` or `unknown` · viability `high` · a strategic bet in discovery context · clarity not `clear` but the customer is retention-critical or strategic |
+| Full | any of: two or more risks `high` · value or viability `high` or `unknown` together with any other risk `high` or `unknown` · viability `high` · a strategic bet in discovery context · clarity not `clear` but the customer is retention-critical or strategic |
 | Standard | everything else; name the one or two activities that would close the gap (customer checks, tech spike, viability review, prototype) |
 
 "Solution obvious" means the team could name the implementation in one line with no open access, data-model or permission question. A connector whose access model is unresolved is not obvious; an export option in an existing menu is.

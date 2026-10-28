@@ -187,10 +187,12 @@ Output:
 
 | Risk | What agent checks | Possible outputs |
 |------|-------------------|------------------|
-| **Value** | Supporting evidence, churn or retention language, strategic fit | `low` / `medium` / `high` / `unknown` |
-| **Usability** | New interaction pattern? Multi-step workflow? New type of user? | `low` / `medium` / `high` / `unknown` |
-| **Feasibility** | Multiple systems? Data model change? Unclear scope? Dependencies? | `low` / `medium` / `high` / `unknown` |
-| **Viability** | Pricing, compliance, legal, security, contractual triggers? | `low` / `medium` / `high` / `unknown` |
+| **Value** | Will customers buy it, or users choose to use it? Workarounds, accounts, retention language, strategic fit | `low` / `medium` / `high` / `unknown` |
+| **Usability** | Can users figure out how to use it? New pattern, multi-step workflow, new type of user | `low` / `medium` / `high` / `unknown` |
+| **Feasibility** | Can we build it with the time, skills and technology we have? Systems, data model, scope, dependencies | `low` / `medium` / `high` / `unknown` |
+| **Business viability** | Does it also work for the rest of the business? Pricing, go-to-market, cost to serve, partner contracts, legal and compliance, brand | `low` / `medium` / `high` / `unknown` |
+
+Risk definitions follow Marty Cagan, SVPG, ["The Four Big Risks"](https://www.svpg.com/four-big-risks/). Value and viability are rated separately and are the risks to retire first.
 
 **Key rule:** `unknown` is a valid output. The agent does not guess; it names which risks need a human assessor and what question that person must answer.
 
@@ -215,7 +217,7 @@ Only when neither Disqualify nor Merge applies.
 | Tier | Rule |
 |---|---|
 | **Light** | Clarity `clear` · evidence bar met (one customer with context and a verbatim, or two or more distinct customers) · no risk `high` · at most one risk `unknown` · solution obvious or tightly constrained |
-| **Full** | Any of: two or more risks `high`/`unknown` · viability `high` · a strategic bet per discovery context · clarity not `clear` but the customer is retention-critical or strategic |
+| **Full** | Any of: two or more risks `high` · value or viability `high`/`unknown` together with any other risk `high`/`unknown` · viability `high` · a strategic bet per discovery context · clarity not `clear` but the customer is retention-critical or strategic |
 | **Standard** | Everything else; the proposal names the one or two activities that would close the gap |
 
 The agent records which rule fired and whether the call was clear or borderline. A single-account retention-critical or compliance request never goes Light on evidence count alone.
