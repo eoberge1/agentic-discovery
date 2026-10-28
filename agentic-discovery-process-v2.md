@@ -240,7 +240,7 @@ One proposal per run, grouped by outcome, one line per signal or cluster, each l
 
 ### New evidence for existing opportunities (2)
 - signal 15 → #1041 "Diff view between spec versions" · adds a new segment (SMB)
-- signal 27 → #16516 "Opportunity version history" · same account, nothing new
+- signal 27 → #5428 "Scheduled report delivery" · same account, nothing new
 
 ### Disqualify (3)
 - signal 26 · previously rejected: #89 "Custom export formats", 2026-08-15, "use the API integration instead; validated with 3 accounts" · nothing new since · override if the API does not meet the need

@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: over-cap-window
+expected_outcome: |
+  No window given, so the default 30-day window applies: 42 open signals. The run assesses the 25 most recent, states in the header that 17 remain and offers to continue. The proposal does not claim to cover the unassessed signals.
+context:
+  scaffold_script: place-files.sh

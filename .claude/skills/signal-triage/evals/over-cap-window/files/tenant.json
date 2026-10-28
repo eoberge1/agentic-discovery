@@ -1,0 +1,814 @@
+{
+ "_readme": "Complete tenant data for this test. Resolve the contract tools against it: listSignals = signals filtered by status and date; getSignal = one signal; searchSignals = semantically matching signals (include dismissed only when asked); searchOpportunities = semantically matching opportunities across all statuses; getCustomer = customers[id]; getDiscoveryContext = discovery_context (null means the tool is unavailable). Write tools are unavailable.",
+ "today": "2026-10-28",
+ "discovery_context": {
+  "contract_version": "1",
+  "strategy_summary": "Northstar Reports: reporting and spec management for product teams. 2026 focus: win regulated industries.",
+  "non_goals": [
+   "No on-premise or self-hosted deployment.",
+   "No per-customer custom export formats; the API is the integration path."
+  ],
+  "strategic_bets": [
+   "Regulated industries (medical devices, financial services)"
+  ],
+  "segments": [
+   {
+    "name": "enterprise",
+    "rule": "500+ employees or ARR >= 90k"
+   },
+   {
+    "name": "mid-market",
+    "rule": "50-499 employees"
+   },
+   {
+    "name": "smb",
+    "rule": "under 50 employees"
+   }
+  ],
+  "arr_bands": [
+   {
+    "name": "small",
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "name": "medium",
+    "min": 30000,
+    "max": 90000
+   },
+   {
+    "name": "large",
+    "min": 90000
+   }
+  ],
+  "status_classes": {
+   "active": [
+    "untriaged",
+    "plan",
+    "curated",
+    "prioritized",
+    "in_build"
+   ],
+   "rejected": [
+    "rejected",
+    "archived"
+   ],
+   "shipped": [
+    "shipped"
+   ]
+  },
+  "thresholds": {}
+ },
+ "signals": [
+  {
+   "id": "12",
+   "date": "2026-10-23",
+   "source_type": "slack",
+   "customer_id": "c1",
+   "excerpt": "Do you store version history of opportunity descriptions? Can you add a button to show the version history? For us to be",
+   "verbatim": "Do you store version history of opportunity descriptions? Can you add a button to show the version history? For us to be able to continue using Northstar as part of our medical device quality management system, version history is absolutely necessary. It would be important to see who has written the change. Basic audit trail.\n[Reply from our CSM in the thread]: Thanks, we'll have something for you in the coming week or two.",
+   "source_link": "https://app.example-tenant.com/source/12",
+   "url": "https://app.example-tenant.com/signal/12",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "18",
+   "date": "2026-10-24",
+   "source_type": "call",
+   "customer_id": "c2",
+   "excerpt": "Our auditors asked who changed the spec and when. Right now we export to PDF every Friday just to have a paper trail. We",
+   "verbatim": "Our auditors asked who changed the spec and when. Right now we export to PDF every Friday just to have a paper trail. We need change author and timestamp on every edit, otherwise the notified body will not accept the system.",
+   "source_link": "https://app.example-tenant.com/source/18",
+   "url": "https://app.example-tenant.com/signal/18",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "23",
+   "date": "2026-10-26",
+   "source_type": "support",
+   "customer_id": "c2",
+   "excerpt": "Can we lock the section headings in a template so nobody can rename or delete them? Our regulatory process requires a fi",
+   "verbatim": "Can we lock the section headings in a template so nobody can rename or delete them? Our regulatory process requires a fixed document structure for design inputs.",
+   "source_link": "https://app.example-tenant.com/source/23",
+   "url": "https://app.example-tenant.com/signal/23",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "31",
+   "date": "2026-10-22",
+   "source_type": "call",
+   "customer_id": "c3",
+   "excerpt": "I can't share reports with finance because they only work in Excel. Every month I re-type the numbers into their sheet, ",
+   "verbatim": "I can't share reports with finance because they only work in Excel. Every month I re-type the numbers into their sheet, about two hours each close.",
+   "source_link": "https://app.example-tenant.com/source/31",
+   "url": "https://app.example-tenant.com/signal/31",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "302",
+   "date": "2026-09-10",
+   "source_type": "support",
+   "customer_id": "c6",
+   "excerpt": "Export to xlsx please, our finance team can't use the CSV because formulas get lost.",
+   "verbatim": "Export to xlsx please, our finance team can't use the CSV because formulas get lost.",
+   "source_link": "https://app.example-tenant.com/source/302",
+   "url": "https://app.example-tenant.com/signal/302",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "305",
+   "date": "2026-08-02",
+   "source_type": "email",
+   "customer_id": "c7",
+   "excerpt": "We need Excel output for the monthly close. The CSV is fine for us but the controllers refuse to use it.",
+   "verbatim": "We need Excel output for the monthly close. The CSV is fine for us but the controllers refuse to use it.",
+   "source_link": "https://app.example-tenant.com/source/305",
+   "url": "https://app.example-tenant.com/signal/305",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "40",
+   "date": "2026-10-25",
+   "source_type": "support",
+   "customer_id": "c4",
+   "excerpt": "We have around 300 legacy themes and no way to archive them in bulk. I do it one by one, roughly an hour every month.",
+   "verbatim": "We have around 300 legacy themes and no way to archive them in bulk. I do it one by one, roughly an hour every month.",
+   "source_link": "https://app.example-tenant.com/source/40",
+   "url": "https://app.example-tenant.com/signal/40",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "15",
+   "date": "2026-10-21",
+   "source_type": "call",
+   "customer_id": "c4",
+   "excerpt": "Would be great to see what changed between two versions of a spec instead of reading both. We're a small team, so we don",
+   "verbatim": "Would be great to see what changed between two versions of a spec instead of reading both. We're a small team, so we don't have anyone to proof-read.",
+   "source_link": "https://app.example-tenant.com/source/15",
+   "url": "https://app.example-tenant.com/signal/15",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "27",
+   "date": "2026-10-27",
+   "source_type": "email",
+   "customer_id": "c1",
+   "excerpt": "Can the weekly report be emailed automatically to our board every Monday morning?",
+   "verbatim": "Can the weekly report be emailed automatically to our board every Monday morning?",
+   "source_link": "https://app.example-tenant.com/source/27",
+   "url": "https://app.example-tenant.com/signal/27",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "290",
+   "date": "2026-07-01",
+   "source_type": "call",
+   "customer_id": "c1",
+   "excerpt": "We would like the weekly report sent automatically to the leadership list.",
+   "verbatim": "We would like the weekly report sent automatically to the leadership list.",
+   "source_link": "https://app.example-tenant.com/source/290",
+   "url": "https://app.example-tenant.com/signal/290",
+   "extracted_problem": null,
+   "status": "linked",
+   "linked_opportunity_ids": [
+    "5428"
+   ]
+  },
+  {
+   "id": "26",
+   "date": "2026-10-24",
+   "source_type": "support",
+   "customer_id": "c5",
+   "excerpt": "We need the export in our XML format for the legacy ERP. CSV doesn't work for us; the ERP only accepts our schema.",
+   "verbatim": "We need the export in our XML format for the legacy ERP. CSV doesn't work for us; the ERP only accepts our schema.",
+   "source_link": "https://app.example-tenant.com/source/26",
+   "url": "https://app.example-tenant.com/signal/26",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "9",
+   "date": "2026-07-02",
+   "source_type": "support",
+   "customer_id": "c5",
+   "excerpt": "Could you export in our ERP's XML schema?",
+   "verbatim": "Could you export in our ERP's XML schema?",
+   "source_link": "https://app.example-tenant.com/source/9",
+   "url": "https://app.example-tenant.com/signal/9",
+   "extracted_problem": null,
+   "status": "dismissed",
+   "linked_opportunity_ids": [],
+   "dismissal": {
+    "reason_type": "previously_rejected",
+    "reason": "See opportunity #89: custom formats not pursued, API integration is the path.",
+    "related_opportunity_id": "89",
+    "by": "PM",
+    "at": "2026-08-20"
+   }
+  },
+  {
+   "id": "29",
+   "date": "2026-10-22",
+   "source_type": "note",
+   "customer_id": null,
+   "excerpt": "The dashboard is slow.",
+   "verbatim": "The dashboard is slow.",
+   "source_link": "https://app.example-tenant.com/source/29",
+   "url": "https://app.example-tenant.com/signal/29",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "35",
+   "date": "2026-10-23",
+   "source_type": "call",
+   "customer_id": "c6",
+   "excerpt": "Our security team would need Northstar installed in our own datacenter. Cloud is a hard no for them this year.",
+   "verbatim": "Our security team would need Northstar installed in our own datacenter. Cloud is a hard no for them this year.",
+   "source_link": "https://app.example-tenant.com/source/35",
+   "url": "https://app.example-tenant.com/signal/35",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "38",
+   "date": "2026-10-27",
+   "source_type": "support",
+   "customer_id": "c4",
+   "excerpt": "Add a share button to reports.",
+   "verbatim": "Add a share button to reports.",
+   "source_link": "https://app.example-tenant.com/source/38",
+   "url": "https://app.example-tenant.com/signal/38",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "44",
+   "date": "2026-10-26",
+   "source_type": "email",
+   "customer_id": "c7",
+   "excerpt": "Dark mode please. Half my team works nights.",
+   "verbatim": "Dark mode please. Half my team works nights.",
+   "source_link": "https://app.example-tenant.com/source/44",
+   "url": "https://app.example-tenant.com/signal/44",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "100",
+   "date": "2026-10-21",
+   "source_type": "support",
+   "customer_id": "c3",
+   "excerpt": "Could the PDF export include page numbers?",
+   "verbatim": "Could the PDF export include page numbers?",
+   "source_link": "https://app.example-tenant.com/source/100",
+   "url": "https://app.example-tenant.com/signal/100",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "101",
+   "date": "2026-10-22",
+   "source_type": "email",
+   "customer_id": "c4",
+   "excerpt": "Column widths reset when I reopen a report.",
+   "verbatim": "Column widths reset when I reopen a report.",
+   "source_link": "https://app.example-tenant.com/source/101",
+   "url": "https://app.example-tenant.com/signal/101",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "102",
+   "date": "2026-10-23",
+   "source_type": "call",
+   "customer_id": "c6",
+   "excerpt": "Please add a Finnish date format option.",
+   "verbatim": "Please add a Finnish date format option.",
+   "source_link": "https://app.example-tenant.com/source/102",
+   "url": "https://app.example-tenant.com/signal/102",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "103",
+   "date": "2026-10-24",
+   "source_type": "slack",
+   "customer_id": "c7",
+   "excerpt": "Can I duplicate a spec with one click?",
+   "verbatim": "Can I duplicate a spec with one click?",
+   "source_link": "https://app.example-tenant.com/source/103",
+   "url": "https://app.example-tenant.com/signal/103",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "104",
+   "date": "2026-10-25",
+   "source_type": "support",
+   "customer_id": "c2",
+   "excerpt": "The search ignores accented characters.",
+   "verbatim": "The search ignores accented characters.",
+   "source_link": "https://app.example-tenant.com/source/104",
+   "url": "https://app.example-tenant.com/signal/104",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "105",
+   "date": "2026-10-26",
+   "source_type": "email",
+   "customer_id": "c5",
+   "excerpt": "We want a Slack notification when a report is published.",
+   "verbatim": "We want a Slack notification when a report is published.",
+   "source_link": "https://app.example-tenant.com/source/105",
+   "url": "https://app.example-tenant.com/signal/105",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "106",
+   "date": "2026-10-27",
+   "source_type": "call",
+   "customer_id": "c3",
+   "excerpt": "Font is too small in the sidebar.",
+   "verbatim": "Font is too small in the sidebar.",
+   "source_link": "https://app.example-tenant.com/source/106",
+   "url": "https://app.example-tenant.com/signal/106",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "107",
+   "date": "2026-10-21",
+   "source_type": "slack",
+   "customer_id": "c4",
+   "excerpt": "Can we tag reports by quarter?",
+   "verbatim": "Can we tag reports by quarter?",
+   "source_link": "https://app.example-tenant.com/source/107",
+   "url": "https://app.example-tenant.com/signal/107",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "108",
+   "date": "2026-10-22",
+   "source_type": "support",
+   "customer_id": "c6",
+   "excerpt": "Need a way to print just one section.",
+   "verbatim": "Need a way to print just one section.",
+   "source_link": "https://app.example-tenant.com/source/108",
+   "url": "https://app.example-tenant.com/signal/108",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "109",
+   "date": "2026-10-23",
+   "source_type": "email",
+   "customer_id": "c7",
+   "excerpt": "Keyboard shortcut for new comment please.",
+   "verbatim": "Keyboard shortcut for new comment please.",
+   "source_link": "https://app.example-tenant.com/source/109",
+   "url": "https://app.example-tenant.com/signal/109",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "110",
+   "date": "2026-10-24",
+   "source_type": "call",
+   "customer_id": "c2",
+   "excerpt": "Our logo appears blurry in exports.",
+   "verbatim": "Our logo appears blurry in exports.",
+   "source_link": "https://app.example-tenant.com/source/110",
+   "url": "https://app.example-tenant.com/signal/110",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "111",
+   "date": "2026-10-25",
+   "source_type": "slack",
+   "customer_id": "c5",
+   "excerpt": "Can I sort the opportunity list by last edited?",
+   "verbatim": "Can I sort the opportunity list by last edited?",
+   "source_link": "https://app.example-tenant.com/source/111",
+   "url": "https://app.example-tenant.com/signal/111",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "112",
+   "date": "2026-10-26",
+   "source_type": "support",
+   "customer_id": "c3",
+   "excerpt": "Chart colours are hard to tell apart.",
+   "verbatim": "Chart colours are hard to tell apart.",
+   "source_link": "https://app.example-tenant.com/source/112",
+   "url": "https://app.example-tenant.com/signal/112",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "113",
+   "date": "2026-10-27",
+   "source_type": "email",
+   "customer_id": "c4",
+   "excerpt": "Would like to pin favourite reports.",
+   "verbatim": "Would like to pin favourite reports.",
+   "source_link": "https://app.example-tenant.com/source/113",
+   "url": "https://app.example-tenant.com/signal/113",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "114",
+   "date": "2026-10-21",
+   "source_type": "call",
+   "customer_id": "c6",
+   "excerpt": "Can the table of contents be collapsible?",
+   "verbatim": "Can the table of contents be collapsible?",
+   "source_link": "https://app.example-tenant.com/source/114",
+   "url": "https://app.example-tenant.com/signal/114",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "115",
+   "date": "2026-10-22",
+   "source_type": "slack",
+   "customer_id": "c7",
+   "excerpt": "The weekly digest email arrives twice.",
+   "verbatim": "The weekly digest email arrives twice.",
+   "source_link": "https://app.example-tenant.com/source/115",
+   "url": "https://app.example-tenant.com/signal/115",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "116",
+   "date": "2026-10-23",
+   "source_type": "support",
+   "customer_id": "c2",
+   "excerpt": "Need CSV import for specs.",
+   "verbatim": "Need CSV import for specs.",
+   "source_link": "https://app.example-tenant.com/source/116",
+   "url": "https://app.example-tenant.com/signal/116",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "117",
+   "date": "2026-10-24",
+   "source_type": "email",
+   "customer_id": "c5",
+   "excerpt": "Add a word count to the editor.",
+   "verbatim": "Add a word count to the editor.",
+   "source_link": "https://app.example-tenant.com/source/117",
+   "url": "https://app.example-tenant.com/signal/117",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "118",
+   "date": "2026-10-25",
+   "source_type": "call",
+   "customer_id": "c3",
+   "excerpt": "Can we restrict who can delete reports?",
+   "verbatim": "Can we restrict who can delete reports?",
+   "source_link": "https://app.example-tenant.com/source/118",
+   "url": "https://app.example-tenant.com/signal/118",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "119",
+   "date": "2026-10-26",
+   "source_type": "slack",
+   "customer_id": "c4",
+   "excerpt": "Mobile view cuts off the charts.",
+   "verbatim": "Mobile view cuts off the charts.",
+   "source_link": "https://app.example-tenant.com/source/119",
+   "url": "https://app.example-tenant.com/signal/119",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "120",
+   "date": "2026-10-27",
+   "source_type": "support",
+   "customer_id": "c6",
+   "excerpt": "Want to export comments with the report.",
+   "verbatim": "Want to export comments with the report.",
+   "source_link": "https://app.example-tenant.com/source/120",
+   "url": "https://app.example-tenant.com/signal/120",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "121",
+   "date": "2026-10-21",
+   "source_type": "email",
+   "customer_id": "c7",
+   "excerpt": "Timezone shown in UTC, confusing for us.",
+   "verbatim": "Timezone shown in UTC, confusing for us.",
+   "source_link": "https://app.example-tenant.com/source/121",
+   "url": "https://app.example-tenant.com/signal/121",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "122",
+   "date": "2026-10-22",
+   "source_type": "call",
+   "customer_id": "c2",
+   "excerpt": "Can reports have a cover page?",
+   "verbatim": "Can reports have a cover page?",
+   "source_link": "https://app.example-tenant.com/source/122",
+   "url": "https://app.example-tenant.com/signal/122",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "123",
+   "date": "2026-10-23",
+   "source_type": "slack",
+   "customer_id": "c5",
+   "excerpt": "Spell check for Swedish please.",
+   "verbatim": "Spell check for Swedish please.",
+   "source_link": "https://app.example-tenant.com/source/123",
+   "url": "https://app.example-tenant.com/signal/123",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "124",
+   "date": "2026-10-24",
+   "source_type": "support",
+   "customer_id": "c3",
+   "excerpt": "Need bulk rename for spec sections.",
+   "verbatim": "Need bulk rename for spec sections.",
+   "source_link": "https://app.example-tenant.com/source/124",
+   "url": "https://app.example-tenant.com/signal/124",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "125",
+   "date": "2026-10-25",
+   "source_type": "email",
+   "customer_id": "c4",
+   "excerpt": "Export to Google Sheets?",
+   "verbatim": "Export to Google Sheets?",
+   "source_link": "https://app.example-tenant.com/source/125",
+   "url": "https://app.example-tenant.com/signal/125",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "126",
+   "date": "2026-10-26",
+   "source_type": "call",
+   "customer_id": "c6",
+   "excerpt": "Can I see who viewed a report?",
+   "verbatim": "Can I see who viewed a report?",
+   "source_link": "https://app.example-tenant.com/source/126",
+   "url": "https://app.example-tenant.com/signal/126",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "127",
+   "date": "2026-10-27",
+   "source_type": "slack",
+   "customer_id": "c7",
+   "excerpt": "A template for release notes would help.",
+   "verbatim": "A template for release notes would help.",
+   "source_link": "https://app.example-tenant.com/source/127",
+   "url": "https://app.example-tenant.com/signal/127",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "128",
+   "date": "2026-10-21",
+   "source_type": "support",
+   "customer_id": "c2",
+   "excerpt": "Allow emoji in titles.",
+   "verbatim": "Allow emoji in titles.",
+   "source_link": "https://app.example-tenant.com/source/128",
+   "url": "https://app.example-tenant.com/signal/128",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "129",
+   "date": "2026-10-22",
+   "source_type": "email",
+   "customer_id": "c5",
+   "excerpt": "Autosave seems to lag on long specs.",
+   "verbatim": "Autosave seems to lag on long specs.",
+   "source_link": "https://app.example-tenant.com/source/129",
+   "url": "https://app.example-tenant.com/signal/129",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  }
+ ],
+ "customers": {
+  "c1": {
+   "id": "c1",
+   "name": "Gosta Labs",
+   "domain": "gostalabs.com",
+   "segment": "enterprise",
+   "tier": null,
+   "arr": null,
+   "tenure_since": "2025-11-25",
+   "churn_status": "subscribed",
+   "churn_risk": null,
+   "importance": 5
+  },
+  "c2": {
+   "id": "c2",
+   "name": "Medica Devices",
+   "domain": "medicadevices.com",
+   "segment": "enterprise",
+   "tier": "business",
+   "arr": 140000,
+   "tenure_since": "2024-03-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 4
+  },
+  "c3": {
+   "id": "c3",
+   "name": "Finlease Oy",
+   "domain": "finlease.fi",
+   "segment": "mid-market",
+   "tier": "team",
+   "arr": 60000,
+   "tenure_since": "2025-02-10",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 3
+  },
+  "c4": {
+   "id": "c4",
+   "name": "Acme Retail",
+   "domain": "acmeretail.com",
+   "segment": "smb",
+   "tier": "starter",
+   "arr": 18000,
+   "tenure_since": "2026-01-15",
+   "churn_status": "subscribed",
+   "churn_risk": "medium",
+   "importance": 2
+  },
+  "c5": {
+   "id": "c5",
+   "name": "Contoso Ltd",
+   "domain": "contoso.com",
+   "segment": "enterprise",
+   "tier": "business",
+   "arr": 95000,
+   "tenure_since": "2023-09-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 4
+  },
+  "c6": {
+   "id": "c6",
+   "name": "Bluewave",
+   "domain": "bluewave.io",
+   "segment": "mid-market",
+   "tier": "team",
+   "arr": 45000,
+   "tenure_since": "2025-06-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 3
+  },
+  "c7": {
+   "id": "c7",
+   "name": "Nordic Freight",
+   "domain": "nordicfreight.no",
+   "segment": "smb",
+   "tier": "starter",
+   "arr": 12000,
+   "tenure_since": "2025-10-01",
+   "churn_status": "at_risk",
+   "churn_risk": "high",
+   "importance": 2
+  }
+ },
+ "opportunities": [
+  {
+   "id": "1041",
+   "title": "Diff view between spec versions",
+   "status": "plan",
+   "problem": "Users cannot see what changed between two versions of a spec and re-read the whole document.",
+   "url": "https://app.example-tenant.com/opportunity/1041",
+   "decision": null
+  },
+  {
+   "id": "5428",
+   "title": "Scheduled report delivery",
+   "status": "curated",
+   "problem": "Report owners re-send the same report by hand every week to the same audience.",
+   "url": "https://app.example-tenant.com/opportunity/5428",
+   "decision": null
+  },
+  {
+   "id": "89",
+   "title": "Custom export formats",
+   "status": "rejected",
+   "problem": "Enterprise customers want exports in their own XML/JSON layouts for legacy systems.",
+   "url": "https://app.example-tenant.com/opportunity/89",
+   "decision": {
+    "outcome": "rejected",
+    "reasoning": "Not pursuing custom formats; enterprise customers use the API integration instead. Validated with 3 accounts in Q2.",
+    "decided_by": "Head of Product",
+    "at": "2026-08-15"
+   }
+  },
+  {
+   "id": "312",
+   "title": "API integration guide",
+   "status": "shipped",
+   "problem": "Customers could not get data into downstream systems without engineering help.",
+   "url": "https://app.example-tenant.com/opportunity/312",
+   "decision": {
+    "outcome": "shipped",
+    "reasoning": "",
+    "decided_by": "",
+    "at": "2026-06-30"
+   }
+  },
+  {
+   "id": "777",
+   "title": "Dark mode",
+   "status": "archived",
+   "problem": "Users want a dark theme.",
+   "url": "https://app.example-tenant.com/opportunity/777",
+   "decision": {
+    "outcome": "archived",
+    "reasoning": "",
+    "decided_by": "",
+    "at": "2026-05-02"
+   }
+  }
+ ]
+}

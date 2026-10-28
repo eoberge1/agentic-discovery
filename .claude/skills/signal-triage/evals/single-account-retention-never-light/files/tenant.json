@@ -1,0 +1,212 @@
+{
+ "_readme": "Complete tenant data for this test. Resolve the contract tools against it: listSignals = signals filtered by status and date; getSignal = one signal; searchSignals = semantically matching signals (include dismissed only when asked); searchOpportunities = semantically matching opportunities across all statuses; getCustomer = customers[id]; getDiscoveryContext = discovery_context (null means the tool is unavailable). Write tools are unavailable.",
+ "today": "2026-10-28",
+ "discovery_context": {
+  "contract_version": "1",
+  "strategy_summary": "Northstar Reports: reporting and spec management for product teams. 2026 focus: win regulated industries.",
+  "non_goals": [
+   "No on-premise or self-hosted deployment.",
+   "No per-customer custom export formats; the API is the integration path."
+  ],
+  "strategic_bets": [
+   "Regulated industries (medical devices, financial services)"
+  ],
+  "segments": [
+   {
+    "name": "enterprise",
+    "rule": "500+ employees or ARR >= 90k"
+   },
+   {
+    "name": "mid-market",
+    "rule": "50-499 employees"
+   },
+   {
+    "name": "smb",
+    "rule": "under 50 employees"
+   }
+  ],
+  "arr_bands": [
+   {
+    "name": "small",
+    "min": 0,
+    "max": 30000
+   },
+   {
+    "name": "medium",
+    "min": 30000,
+    "max": 90000
+   },
+   {
+    "name": "large",
+    "min": 90000
+   }
+  ],
+  "status_classes": {
+   "active": [
+    "untriaged",
+    "plan",
+    "curated",
+    "prioritized",
+    "in_build"
+   ],
+   "rejected": [
+    "rejected",
+    "archived"
+   ],
+   "shipped": [
+    "shipped"
+   ]
+  },
+  "thresholds": {}
+ },
+ "signals": [
+  {
+   "id": "60",
+   "date": "2026-10-24",
+   "source_type": "call",
+   "customer_id": "c3",
+   "excerpt": "If we can't get the monthly board pack as a scheduled PDF by Q1 we'll have to move to another tool. I build it by hand e",
+   "verbatim": "If we can't get the monthly board pack as a scheduled PDF by Q1 we'll have to move to another tool. I build it by hand every month and the board has complained twice about late delivery.",
+   "source_link": "https://app.example-tenant.com/source/60",
+   "url": "https://app.example-tenant.com/signal/60",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  }
+ ],
+ "customers": {
+  "c1": {
+   "id": "c1",
+   "name": "Gosta Labs",
+   "domain": "gostalabs.com",
+   "segment": "enterprise",
+   "tier": null,
+   "arr": null,
+   "tenure_since": "2025-11-25",
+   "churn_status": "subscribed",
+   "churn_risk": null,
+   "importance": 5
+  },
+  "c2": {
+   "id": "c2",
+   "name": "Medica Devices",
+   "domain": "medicadevices.com",
+   "segment": "enterprise",
+   "tier": "business",
+   "arr": 140000,
+   "tenure_since": "2024-03-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 4
+  },
+  "c3": {
+   "id": "c3",
+   "name": "Finlease Oy",
+   "domain": "finlease.fi",
+   "segment": "mid-market",
+   "tier": "team",
+   "arr": 60000,
+   "tenure_since": "2025-02-10",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 3
+  },
+  "c4": {
+   "id": "c4",
+   "name": "Acme Retail",
+   "domain": "acmeretail.com",
+   "segment": "smb",
+   "tier": "starter",
+   "arr": 18000,
+   "tenure_since": "2026-01-15",
+   "churn_status": "subscribed",
+   "churn_risk": "medium",
+   "importance": 2
+  },
+  "c5": {
+   "id": "c5",
+   "name": "Contoso Ltd",
+   "domain": "contoso.com",
+   "segment": "enterprise",
+   "tier": "business",
+   "arr": 95000,
+   "tenure_since": "2023-09-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 4
+  },
+  "c6": {
+   "id": "c6",
+   "name": "Bluewave",
+   "domain": "bluewave.io",
+   "segment": "mid-market",
+   "tier": "team",
+   "arr": 45000,
+   "tenure_since": "2025-06-01",
+   "churn_status": "subscribed",
+   "churn_risk": "low",
+   "importance": 3
+  },
+  "c7": {
+   "id": "c7",
+   "name": "Nordic Freight",
+   "domain": "nordicfreight.no",
+   "segment": "smb",
+   "tier": "starter",
+   "arr": 12000,
+   "tenure_since": "2025-10-01",
+   "churn_status": "at_risk",
+   "churn_risk": "high",
+   "importance": 2
+  }
+ },
+ "opportunities": [
+  {
+   "id": "1041",
+   "title": "Diff view between spec versions",
+   "status": "plan",
+   "problem": "Users cannot see what changed between two versions of a spec and re-read the whole document.",
+   "url": "https://app.example-tenant.com/opportunity/1041",
+   "decision": null
+  },
+  {
+   "id": "89",
+   "title": "Custom export formats",
+   "status": "rejected",
+   "problem": "Enterprise customers want exports in their own XML/JSON layouts for legacy systems.",
+   "url": "https://app.example-tenant.com/opportunity/89",
+   "decision": {
+    "outcome": "rejected",
+    "reasoning": "Not pursuing custom formats; enterprise customers use the API integration instead. Validated with 3 accounts in Q2.",
+    "decided_by": "Head of Product",
+    "at": "2026-08-15"
+   }
+  },
+  {
+   "id": "312",
+   "title": "API integration guide",
+   "status": "shipped",
+   "problem": "Customers could not get data into downstream systems without engineering help.",
+   "url": "https://app.example-tenant.com/opportunity/312",
+   "decision": {
+    "outcome": "shipped",
+    "reasoning": "",
+    "decided_by": "",
+    "at": "2026-06-30"
+   }
+  },
+  {
+   "id": "777",
+   "title": "Dark mode",
+   "status": "archived",
+   "problem": "Users want a dark theme.",
+   "url": "https://app.example-tenant.com/opportunity/777",
+   "decision": {
+    "outcome": "archived",
+    "reasoning": "",
+    "decided_by": "",
+    "at": "2026-05-02"
+   }
+  }
+ ]
+}

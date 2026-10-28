@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: single-account-retention-never-light
+expected_outcome: |
+  One open signal: a clear, well-evidenced problem from one mid-market account with an explicit retention threat. Because it is a single-account retention-critical request it must not be recommended Light on evidence count alone; it goes Standard with a second-account or prospect check named as the activity (or Full if viability is judged high). The retention_critical flag is set.
+context:
+  scaffold_script: place-files.sh

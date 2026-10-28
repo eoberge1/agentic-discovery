@@ -26,7 +26,7 @@ A complete run on a fictional tenant (a B2B reporting product), showing every ou
 
 ### New evidence for existing opportunities (2)
 - signal 15 → #1041 "Diff view between spec versions" · adds a new segment (SMB)
-- signal 27 → #16516 "Opportunity version history" · same account as before, nothing new
+- signal 27 → #5428 "Scheduled report delivery" · same account as before, nothing new
 
 ### Disqualify (3)
 - signal 26 · previously rejected: #89 "Custom export formats", 2026-08-15, "Not pursuing custom formats; enterprise customers use the API integration instead. Validated with 3 accounts." · nothing new since · override if the customer shows the API integration does not meet the need
@@ -97,7 +97,7 @@ Resolved the reply to an action list, re-assessed signal 26 without the disquali
 ```markdown
 About to write:
 - Create A (Full), B (Light), C (Standard)
-- Link 15 → #1041, 27 → #16516
+- Link 15 → #1041, 27 → #5428
 - Hold 26: re-proposed below
 - Not touching 29, 35, 38 (not confirmed)
 
@@ -114,7 +114,7 @@ Done:
 - B → #16602 "Share reports with finance in Excel" (Light)
 - C → #16603 "Bulk-archive unused themes" (Standard)
 - 15 → #1041 linked (note: adds SMB segment)
-- 27 → #16516 linked (note: same account, nothing new)
+- 27 → #5428 linked (note: same account, nothing new)
 Held: 26 (awaiting your confirmation), 29, 35, 38 (not confirmed; still open).
 Needs human: set Gosta Labs ARR; viability review for #16601; feasibility assessor on audit model scope.
 ```

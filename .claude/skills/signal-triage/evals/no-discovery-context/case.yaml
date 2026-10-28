@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: no-discovery-context
+expected_outcome: |
+  Same window, but getDiscoveryContext is unavailable. The proposal header states that out-of-scope and strategic-bet checks were skipped. Signal 35 (on-premise) is not disqualified as out of scope; it is tiered or marked needs-clarification instead. Everything else behaves as in the base case.
+context:
+  scaffold_script: place-files.sh
