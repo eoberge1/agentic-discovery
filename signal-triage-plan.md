@@ -1,6 +1,6 @@
 # Signal Triage Skill: Plan
 
-**Status:** Draft v0.2 (plan, not yet built)
+**Status:** v0.3 (built; see §12a)
 **Date:** 2026-10-28
 **Implements:** `agentic-discovery-process-v2.md` §5 (Stage 2: Triage), with the change in §2 below
 **Replaces:** the existing draft in `.claude/skills/signal-triage/` (rebuilt from scratch)
@@ -299,6 +299,14 @@ Pass criteria: correct outcomes, every quote traceable to a returned id, no writ
 - Default cap of 25: right for the first customers, or should it be lower for a first run?
 - Should "needs clarification" items be writable (e.g. a note on the signal asking the source for specifics), or stay in chat only in v1?
 - Do we want the proposal to suggest an owner for each new opportunity (from team data), or leave ownership to the customer entirely?
+- A 30-day window of one-line asks produces many small Light opportunities (15 in the over-cap eval). Should the proposal offer to batch small, same-area asks into one "polish" opportunity, or is one opportunity per ask what prioritization wants?
+
+## 12a. Status, 2026-10-28
+
+- Skill built and revised once (`.claude/skills/signal-triage/`, iteration 2). Groups now: create / new evidence / post-launch feedback / disqualify / route elsewhere / needs clarification.
+- Six fixture evals in `evals/`; iteration 1 passed 27 of 27 assertions; iteration 2 re-run on the three affected cases.
+- Live read-only dry run on our tenant done with the interim mapping (`signal-triage-dryrun-2026-10-28.md`). It worked end to end and showed the three server gaps that matter most: no signal status or dismissal, keyword-only search, no decision reasoning on opportunities.
+- Engineering handoff: `signal-triage-mcp-gaps.md` (ranked gaps, decisions A–F, interim mapping).
 
 ## 13. Work plan
 

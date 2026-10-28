@@ -113,7 +113,7 @@ One stop: if the shared driver is a capability the product already has in produc
 
 ## 4. Propose
 
-Write the proposal in the format in [references/proposal-format.md](references/proposal-format.md): a header with the window, counts, cap remainder, contract version and skipped checks; then groups in this order: create opportunities, new evidence for existing opportunities, post-launch feedback, disqualify, route elsewhere, needs clarification. One line per signal or cluster, carrying its artifact. Offer the full assessment of any line on request ("show 26", "show A").
+Write the proposal in the format in [references/proposal-format.md](references/proposal-format.md): a header with the window, counts, cap remainder, contract version and skipped checks; then groups in this order: create opportunities, new evidence for existing opportunities, post-launch feedback, disqualify, route elsewhere, needs clarification. One line per signal or cluster, carrying its artifact and nothing else; the reasoning behind it belongs in the full assessment. Name a proposed opportunity by its problem in at most eight words; a title that needs a colon is two titles. Offer the full assessment of any line on request ("show 26", "show A").
 
 Then stop. Do not write anything.
 
@@ -122,7 +122,7 @@ Then stop. Do not write anything.
 Read the user's reply as a per-item action list:
 
 - "do it", "go ahead" → every line in the proposal
-- "create the proposed opportunities" → that group only
+- "create the proposed opportunities" → that group only; "link the evidence" → the new-evidence and post-launch groups together, since both are links
 - "signal 26 should not be disqualified" → drop the disqualify rule for 26, re-tier it, and re-propose that line; write nothing for 26 until it is confirmed
 - "33 is Standard, not vague", "merge B into A", "skip 35" → direct overrides; record them as overriding the recommendation
 

@@ -52,7 +52,7 @@ Flags: signal 23 contains a delivery commitment ("two weeks") · signal 12 is re
 Say "show <id or letter>" for a full assessment. Nothing has been written.
 ```
 
-Keep lines to one line. The full assessment is where detail lives. Empty groups are omitted, except that "Create opportunities" is always shown, with (0) if nothing qualified.
+Keep lines to one line and roughly 200 characters: the artifact, the counts, the tier and one phrase of reasoning. The full assessment is where detail lives. Titles are the problem in at most eight words. Empty groups are omitted, except that "Create opportunities" is always shown, with (0) if nothing qualified.
 
 ## 2. Full assessment (on request)
 
