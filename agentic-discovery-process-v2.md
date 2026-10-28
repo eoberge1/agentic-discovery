@@ -137,7 +137,7 @@ select → assess each signal → cluster → propose → confirm → act
 | **Select** | Open signals in a window (default 30 days, cap 25 per run; the remainder is stated, never implied) | – |
 | **Assess** | Per signal, in fixed order: clarity → existing and rejected opportunities → evidence → risks → disqualify/merge check → tier → flags (§5.2) | – |
 | **Cluster** | Signals with the same problem, or the same underlying driver, become one proposed opportunity | – |
-| **Propose** | Grouped proposal: create / new evidence / disqualify / needs clarification (§5.3) | – |
+| **Propose** | Grouped proposal: create / new evidence / post-launch feedback / disqualify / route elsewhere / needs clarification (§5.3) | – |
 | **Confirm** | Owner replies in chat; partial confirmation and per-line overrides are allowed; an override becomes a re-proposal, not a write | – |
 | **Act** | Create opportunities, link evidence, dismiss signals with reasons; re-check each signal is still open first | yes |
 
@@ -265,9 +265,11 @@ The full per-signal assessment (clarity, risk table, evidence, existing opportun
 | **Light** | Problem clear + evidence exists + risks low or known + solution obvious | Opportunity created with its signals and triage record → Curated |
 | **Standard** | Problem clear but evidence thin OR 1–2 risks medium/unknown | Opportunity created → Plan (targeted validation, activities named) |
 | **Full** | Problem unclear OR multiple high/unknown risks OR strategic bet | Opportunity created → Plan (full discovery) |
-| **Needs clarification** | Feature-request shape, underlying problem not found | Nothing written; the proposal names who to ask and what |
+| **Post-launch feedback** | The problem is already addressed by something shipped | Signal linked to the shipped opportunity as post-launch feedback (praise, gap, or ask beyond it); feeds post-launch learning (§14) |
+| **Route elsewhere** | Bug, support question, or context with no product ask | Signal dismissed as not-discovery with the kind recorded, so the bug, support or account owner can find it |
+| **Needs clarification** | Ask could serve several different problems and the underlying one was not found | Nothing written; the proposal names who to ask and what |
 
-**Processing order:** Disqualify and Merge are checked first. Only if neither applies is the tier assessed.
+**Processing order:** Kind first (bugs, support and context leave early), then Disqualify, Merge and Post-launch. Only if none applies is the tier assessed.
 
 **Human decision:** The agent proposes. The owner confirms in chat, in full or in part. An unconfirmed line stays open; an overridden line is re-proposed with the owner's context before anything is written.
 

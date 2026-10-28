@@ -278,6 +278,32 @@
    "linked_opportunity_ids": []
   },
   {
+   "id": "45",
+   "date": "2026-10-27",
+   "source_type": "support",
+   "customer_id": "c6",
+   "excerpt": "Column widths reset every time I reopen a report. Started last week.",
+   "verbatim": "Column widths reset every time I reopen a report. Started last week.",
+   "source_link": "https://app.example-tenant.com/source/45",
+   "url": "https://app.example-tenant.com/signal/45",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
+   "id": "46",
+   "date": "2026-10-25",
+   "source_type": "call",
+   "customer_id": "c3",
+   "excerpt": "The new API integration guide helped us get started, but the auth section still cost our developer a day. The token scop",
+   "verbatim": "The new API integration guide helped us get started, but the auth section still cost our developer a day. The token scopes part is unclear.",
+   "source_link": "https://app.example-tenant.com/source/46",
+   "url": "https://app.example-tenant.com/signal/46",
+   "extracted_problem": null,
+   "status": "open",
+   "linked_opportunity_ids": []
+  },
+  {
    "id": "100",
    "date": "2026-10-21",
    "source_type": "support",

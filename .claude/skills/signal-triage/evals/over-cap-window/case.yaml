@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: over-cap-window
 expected_outcome: |
-  No window given, so the default 30-day window applies: 42 open signals. The run assesses the 25 most recent, states in the header that 17 remain and offers to continue. The proposal does not claim to cover the unassessed signals.
+  No window given, so the default 30-day window applies: 44 open signals. The run assesses the 25 most recent (finishing a conversation if the cap splits one), states in the header how many remain and offers to continue. The proposal does not claim to cover the unassessed signals. One-line defect reports among the filler are routed elsewhere as bugs; small self-explanatory asks are tiered rather than all sent to needs clarification.
 context:
   scaffold_script: place-files.sh

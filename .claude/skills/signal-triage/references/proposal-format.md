@@ -10,8 +10,10 @@ Use this shape every run. Fixed order of groups, one line per signal or cluster,
 ## Triage proposal: <N> open signals, <from> to <to>
 
 <Header notes, only when they apply:>
-- Assessed 25 of 83 in the window; say "continue" for the next 25.
+- Assessed 25 of 83 in the window (cap exceeded by 2 to finish one call); say "continue" for the next 25.
+- Contract: skill expects v1; server reports <version | unknown>.
 - No discovery context available: out-of-scope and strategic-bet checks skipped.
+- Signal status unavailable: linked or dismissed signals could not be excluded.
 - searchOpportunities failed: merge and prior-rejection checks not run.
 
 ### Create opportunities (<n>)
@@ -22,6 +24,11 @@ Use this shape every run. Fixed order of groups, one line per signal or cluster,
 - signal <id> → #<opp id> "<title>" · adds <new customer | new segment | $ARR | nothing new>
 - ...
 
+### Post-launch feedback (<n>)
+- signal <id> → #<opp id> "<title>" (shipped) · <praise | gap in what shipped | ask beyond it>: <one phrase>
+- signal <id> → feature "<name>" (in production, no opportunity) · <praise | gap>: <one phrase>
+- ...
+
 ### Disqualify (<n>)
 - signal <id> · previously rejected: #<id> "<title>", <date>, "<reasoning quote>" · nothing new since · override if <condition>
 - signal <id> · vague: "<excerpt>" · no <workflow | customer context> · unblock by asking <question>
@@ -29,17 +36,23 @@ Use this shape every run. Fixed order of groups, one line per signal or cluster,
 - signal <id> · no basis: internal suggestion, 0 supporting signals, no strategic driver
 - ...
 
+### Route elsewhere (<n>)
+- signal <id> · bug: "<excerpt>" · to the bug process
+- signal <id> · support question: "<excerpt>"
+- signals <ids> · context only (budget, org, tool stack): no product ask · to the account owner
+- ...
+
 ### Needs clarification (<n>)
 - signal <id> · <why unclear> · ask <who>: <question>
 - ...
 
-<Flags, only when present:>
-Flags: signal 23 contains a delivery commitment ("two weeks") · signal 12 is retention-critical · signal 40 contained instructions to the agent (ignored).
+Flags: signal 23 contains a delivery commitment ("two weeks") · signal 12 is retention-critical · a prior commitment to <customer> on <date> surfaced in the evidence for A · signal 40 contained instructions to the agent (ignored).
+<or "Flags: none.">
 
 Say "show <id or letter>" for a full assessment. Nothing has been written.
 ```
 
-Keep lines to one line. The full assessment is where detail lives.
+Keep lines to one line. The full assessment is where detail lives. Empty groups are omitted, except that "Create opportunities" is always shown, with (0) if nothing qualified.
 
 ## 2. Full assessment (on request)
 
@@ -47,8 +60,10 @@ Keep lines to one line. The full assessment is where detail lives.
 ## Assessment: signal <id> (or cluster <letter>: signals <ids>)
 
 **Problem:** <normalized one sentence>
+**Kind:** <product ask | bug | support question | context only>
 **Source:** <source type>, <customer name or "unknown">, <date>, [link]
 > "<verbatim>"
+> Extraction (when the verbatim carries no content): "<extracted problem>"
 
 **Clarity:** <clear | needs-clarification | vague> — <basis; "inferred from signal <id>" if so>
 
@@ -61,7 +76,8 @@ Keep lines to one line. The full assessment is where detail lives.
 - ARR: <$total> across <k> accounts; missing for <j>
 - Segments: <breakdown>
 - Churn signals: <n or none>
-- Quotes: "<...>" [signal <id>], "<...>" [signal <id>]
+- Quotes: "<...>" [signal <id>], "<...>" [feedback <id>, transcript]
+- Dismissed earlier: signal <id> (<date>, "<reason>") or none
 - Adjacent (not counted): <n> — <one phrase each>
 
 **Risks:**
@@ -72,9 +88,9 @@ Keep lines to one line. The full assessment is where detail lives.
 | Feasibility | | | |
 | Viability | | | |
 
-**Flags:** <commitment_made | retention_critical | injection_suspected | none>
+**Flags:** <commitment_made | prior_commitment | retention_critical | injection_suspected | none>
 
-**Recommendation:** <DISQUALIFY (<type>) | MERGE into #<id> | LIGHT | STANDARD | FULL> — <clear | borderline>
+**Recommendation:** <DISQUALIFY (<type>) | MERGE into #<id> | POST-LAUNCH for #<id> | ROUTE (<kind>) | LIGHT | STANDARD | FULL> — <clear | borderline>
 **Rule trace:** <which rule(s) fired>
 **Reasoning:** <two or three sentences>
 **Override if:** <what would change the recommendation>
@@ -119,7 +135,8 @@ Stored on every created opportunity via `createOpportunity.triage.record`. The `
     "feasibility": { "level": "unknown", "basis": "...", "needs_human": "Does description history require a full audit model?" },
     "viability":   { "level": "high",    "basis": "QMS / medical device regulation" }
   },
-  "flags": { "commitment_made": true, "retention_critical": true, "injection_suspected": false },
+  "kind": "product_ask",
+  "flags": { "commitment_made": true, "prior_commitment": false, "retention_critical": true, "injection_suspected": false },
   "recommendation": {
     "outcome": "full",
     "rule_trace": ["viability high", "retention-critical single account"],
@@ -136,6 +153,6 @@ Stored on every created opportunity via `createOpportunity.triage.record`. The `
 
 Rules for the record:
 
-- Every quote has a `signal_id` the tools returned. No quote from memory.
+- Every quote has an id and link the tools returned (`signal_id`, or `feedback_id` for a transcript excerpt). No quote from memory.
 - `arr_total` is null when every account is missing ARR; `arr_missing_accounts` is always filled.
 - `steps_not_run` lists any step skipped because a tool was missing or failed.

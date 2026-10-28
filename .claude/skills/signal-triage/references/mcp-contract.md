@@ -52,7 +52,7 @@ OpportunitySummary {
 }
 ```
 
-**Status classes.** The skill needs to know which tenant statuses are *active* (merge target), *rejected/archived* (prior decision), and *shipped*. `getDiscoveryContext` may return this mapping; otherwise the skill treats `rejected`, `archived`, `disqualified` as rejected, `shipped`, `done`, `released` as shipped, and everything else as active.
+**Status classes.** The skill needs to know which tenant statuses are *active* (merge target), *rejected* (prior decision, needs reasoning), *shipped* (post-launch feedback) and *parked* (iceboxed or paused: related only, never a merge target, never a rejection basis). `getDiscoveryContext` may return this mapping; otherwise the skill treats `rejected`, `archived`, `disqualified` as rejected, `shipped`, `done`, `released`, `launched` as shipped, `icebox`, `parked`, `paused` as parked, and everything else as active.
 
 ## Read tools
 
@@ -68,7 +68,7 @@ Returns tenant-level context the skill cannot infer.
   strategic_bets?: string[],             // topics that force Full tier
   segments?: { name: string, rule: string }[],
   arr_bands?: { name: string, min: number, max?: number }[],
-  status_classes?: { active: string[], rejected: string[], shipped: string[] },
+  status_classes?: { active: string[], rejected: string[], shipped: string[], parked: string[] },
   thresholds?: {                         // overrides for the defaults in SKILL.md
     light_min_customers?: number,
     full_min_high_or_unknown_risks?: number,
@@ -127,17 +127,17 @@ Returns `{ id, url }`.
 
 ### `linkSignalToOpportunity({ signal_id, opportunity_id, relation, note })` — required
 
-`relation` is `"supporting"` or `"adjacent"`. `note` says what the signal adds ("adds SMB segment", "same account, nothing new"). Marks the signal `linked`. Returns `{ ok: true }`.
+`relation` is `"supporting"`, `"adjacent"` or `"post_launch"` (feedback on something the opportunity already shipped). `note` says what the signal adds ("adds SMB segment", "same account, nothing new", "praise", "gap in what shipped"). Marks the signal `linked`. Returns `{ ok: true }`.
 
 ### `dismissSignal({ signal_id, reason_type, reason, related_opportunity_id?, overrides_recommendation })` — required
 
-`reason_type` is one of `previously_rejected | vague | out_of_scope | no_basis | other`. `reason` is the human-readable reasoning that future triage runs will read back through `searchSignals(include_dismissed: true)`. Returns `{ ok: true }`.
+`reason_type` is one of `previously_rejected | vague | out_of_scope | no_basis | not_discovery | other`. `not_discovery` covers bugs, support questions, context-only rows and post-launch feedback on a feature that has no opportunity to link to; the `reason` names which ("bug: column widths reset", "post-launch: Intercom integration") so the account, support or bug owner can find it. `reason` is the human-readable reasoning that future triage runs will read back through `searchSignals(include_dismissed: true)`. Returns `{ ok: true }`.
 
 ## Rules the server must honour
 
 1. **Null means missing.** ARR, tier and segment are nullable. The skill never treats null as 0, and the server must not either.
 2. **Stable ids and URLs** on every signal and opportunity, so proposal lines can link.
-3. **Reasoning travels with decisions.** Rejected opportunities and dismissed signals carry reasoning text. This is the memory that stops the same ask from being re-triaged from scratch.
+3. **Reasoning travels with decisions.** Rejected opportunities and dismissed signals carry reasoning text. This is the memory that stops the same ask from being re-triaged from scratch. A rejected item without reasoning is treated as related, not as a prior decision.
 4. **Search is semantic.** "Audit trail for edits" must find "version history of descriptions".
 5. **Paging is explicit.** The skill pages before concluding "none found".
 6. **Writes are idempotent enough to re-check.** The skill calls `getSignal` before each write and skips signals no longer `open`. The server should reject a link or dismissal on a non-open signal rather than duplicating it.
@@ -158,5 +158,6 @@ Returns `{ id, url }`.
 
 - Return inline `customer` on `searchSignals` rows. Without it the roll-up for one signal can cost ten `getCustomer` calls.
 - `total` on `listSignals` is cheap for the server and lets the skill say "25 of 83 assessed" instead of "there may be more".
-- Keep `excerpt` short and `verbatim` complete. The skill quotes from `verbatim` only.
+- Keep `excerpt` short and `verbatim` complete. Populate `extracted_problem`: when the verbatim is content-free ("yeah, that would be important"), the extraction is what the skill can show.
+- Any quote the server returns must come with an id and a link, whether it is a signal, a feedback item or a transcript excerpt. The skill will not use a quote it cannot link.
 - Decision reasoning should be the human's own words, not a status code. The next triage run quotes it to the next human.
