@@ -1,8 +1,8 @@
 # Agentic Discovery: Process Definition
 
-**Status:** Draft v2.0
+**Status:** Draft v2.1
 **Owner:** Product Management
-**Last updated:** 2026-10-27
+**Last updated:** 2026-10-28
 **Previous version:** `agentic-discovery-process.md` (v0.2)
 **Related:** [The AI-Native SDLC Playbook](https://claude.com/resources/articles/the-ai-native-sdlc-playbook)
 
@@ -13,6 +13,8 @@
 This document defines the **Agentic Discovery** process that sits before the **AI-native SDLC** (Plan → Design → Build → Test → Deploy → Maintain). Discovery decides what is worth building and produces an evidence-backed `intent.md` ready for implementation.
 
 **Key change from v1:** The process is now **tiered**. Not every opportunity needs full discovery. A triage agent assesses each incoming signal and routes it appropriately—simple, well-framed requests move fast; uncertain or risky bets get deeper investigation.
+
+**Change in v2.1:** Triage runs on **signals**, before an opportunity exists. An opportunity is created only when the owner confirms a triage proposal (§4–5). The `signal-triage` skill is the normative definition of the triage procedure.
 
 > **Guiding principle:** *The depth of discovery should match the uncertainty of the problem.*
 
@@ -29,21 +31,21 @@ This document defines the **Agentic Discovery** process that sits before the **A
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         1. CAPTURE                                          │
-│           Create opportunity with draft intent.md                           │
+│      Signals created from inputs (calls, notes, Slack, support)             │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         2. TRIAGE                                           │
-│    Agent assesses: problem clarity, risks, evidence, existing opportunities │
-│    Output: Disqualify / Merge / Light / Standard / Full                     │
+│   Agent assesses each open signal, clusters, proposes; owner confirms       │
+│   Output: Disqualify / New evidence / Create (Light / Standard / Full)      │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                  ┌──────────────────┼──────────────────┐
                  ▼                  │                  ▼
 ┌────────────────────────┐          │     ┌─────────────────────────────────┐
-│     DISQUALIFIED       │          │     │        MERGE                    │
-│                        │          │     │   Add to existing opportunity   │
+│     DISQUALIFIED       │          │     │      NEW EVIDENCE               │
+│                        │          │     │  Link signal to existing opp.   │
 │  • Already rejected    │          │     └─────────────────────────────────┘
 │  • Vague/unactionable  │          │
 │  • No path forward     │          │
@@ -98,40 +100,50 @@ All sources feed into the same process. The triage agent normalizes them.
 
 ## 4. Stage 1: Capture
 
-**What:** Create an opportunity with a draft `intent.md`. This is the atomic unit of discovery.
+**What:** A **signal** is the atomic unit entering discovery: one piece of input with its verbatim text, its source and, where known, its customer. ProductSense creates signals automatically from the inputs it reads (call transcripts, meeting notes, Slack messages, support threads). Anyone can also add one by hand, for example by pasting a message into the triage conversation.
 
-**Who:** Anyone can create an opportunity. An **opportunity owner** is assigned (defaults to creator, or explicitly assigned).
+**Who:** Mostly automatic. A human adds manual signals and, where ProductSense could not, names the customer.
 
-**How:** Use the `opportunity` skill or create directly in ProductSense. The opportunity must contain at minimum:
+**Minimum content of a signal:**
 
-```markdown
-# Intent: <title>
+- Verbatim text, as the originator said it
+- Source: where it came from (call, thread, ticket, doc), with a link
+- Customer, if known (this is what makes ARR, segment and churn context possible)
 
-## Problem
-<Who has the problem, what they can't do, why it matters>
+**Change from v2.0:** Capture no longer creates an opportunity. Opportunities are created by triage (Stage 2) once a signal, or a cluster of signals, has been assessed and the owner has confirmed. This keeps the backlog free of opportunities that would be merged or disqualified immediately, and means every opportunity is born with evidence and a triage assessment. Ideas that originate internally (strategy, a PM, engineering) enter the same way, written down as a signal with source type `internal`.
 
-## Source
-<Where this came from: customer name, ticket, call, strategy doc, etc.>
+**Artifact:** Open signal in ProductSense.
 
-## Proposed outcome (optional)
-<What success looks like, if known>
-```
-
-**Artifact:** Opportunity in ProductSense with draft `intent.md` attached.
-
-**Gate:** None. Capture is open—anyone can add to the backlog.
+**Gate:** None. Capture is open.
 
 ---
 
 ## 5. Stage 2: Triage
 
-**What:** The triage agent assesses each new opportunity and enriches it with context. This is the key innovation—front-loading intelligence so routing is informed.
+**What:** The triage agent takes a window of open signals, assesses each one with the same procedure, clusters signals that describe the same problem, and presents one proposal. The opportunity owner confirms the proposal in chat, in full or in part, and can override any line. Only then does anything change in ProductSense.
 
-**Who:** Agent runs automatically on new opportunities. Opportunity owner reviews output.
+**Who:** Run on demand by whoever owns the inbox ("triage the signals from the past 5 days"). The opportunity owner reviews and confirms.
 
-### 5.1 What the Triage Agent Does
+**Skill:** `signal-triage`. It is standalone (depends only on the ProductSense MCP) and is the normative definition of the procedure; this section summarizes it.
 
-#### A. Problem Clarity Check
+### 5.1 The flow
+
+```
+select → assess each signal → cluster → propose → confirm → act
+```
+
+| Step | What happens | Writes to ProductSense |
+|---|---|---|
+| **Select** | Open signals in a window (default 30 days, cap 25 per run; the remainder is stated, never implied) | – |
+| **Assess** | Per signal, in fixed order: clarity → existing and rejected opportunities → evidence → risks → disqualify/merge check → tier → flags (§5.2) | – |
+| **Cluster** | Signals with the same problem, or the same underlying driver, become one proposed opportunity | – |
+| **Propose** | Grouped proposal: create / new evidence / disqualify / needs clarification (§5.3) | – |
+| **Confirm** | Owner replies in chat; partial confirmation and per-line overrides are allowed; an override becomes a re-proposal, not a write | – |
+| **Act** | Create opportunities, link evidence, dismiss signals with reasons; re-check each signal is still open first | yes |
+
+### 5.2 What the agent assesses per signal
+
+#### A. Problem clarity
 
 Distinguishes between:
 - **Clear problem:** "I can't share reports with finance because they need Excel format"
@@ -140,175 +152,124 @@ Distinguishes between:
 
 Output: `clear` / `needs-clarification` / `vague`
 
-If not clear, the agent attempts to find the underlying problem from evidence. If it can't, it flags for human clarification.
+For a feature request, the agent searches the same customer's other signals for the underlying problem and, if found, restates it and marks the clarity as inferred. If it cannot, it records the questions a human would have to ask.
 
-#### B. Risk Scan
+#### B. Existing opportunity check
 
-Quick assessment across four risk types:
+```
+searchOpportunities (all statuses, incl. rejected / archived / shipped)
+searchSignals (include_dismissed)   → the same ask dismissed earlier
+```
+
+Output per hit:
+- **Duplicate:** same problem, active opportunity → merge candidate
+- **Related:** same area, different problem → mentioned, not merged
+- **Prior rejection:** rejected or archived with reasoning → disqualify candidate; reasoning and date kept
+- **Shipped:** already addressed → post-launch feedback for that opportunity, unless the ask goes beyond what shipped
+
+#### C. Evidence search
+
+```
+searchSignals   → related signals; each row carries its customer (segment, tier, ARR)
+getCustomer     → tier, ARR, churn status, importance
+```
+
+Hits are split into **supporting** (same problem) and **adjacent** (same area, different problem); only supporting hits count.
+
+Output:
+- Distinct customers, signal count, first and last mention
+- ARR represented **and** "ARR missing for N accounts" (missing is never zero)
+- Segment breakdown per the tenant's definitions
+- Churn signals among those customers
+- Key verbatim quotes, each with a signal id and link
+
+#### D. Risk scan
 
 | Risk | What agent checks | Possible outputs |
 |------|-------------------|------------------|
-| **Value** | Is there evidence customers want this? Other mentions? ARR represented? | `low` / `medium` / `high` / `unknown` |
-| **Usability** | Is the interaction complex? New patterns? | `low` / `medium` / `high` / `unknown` |
-| **Feasibility** | Multiple systems? Unclear scope? Dependencies? | `low` / `medium` / `high` / `unknown` |
-| **Viability** | Pricing, compliance, legal triggers? | `low` / `medium` / `high` / `unknown` |
+| **Value** | Supporting evidence, churn or retention language, strategic fit | `low` / `medium` / `high` / `unknown` |
+| **Usability** | New interaction pattern? Multi-step workflow? New type of user? | `low` / `medium` / `high` / `unknown` |
+| **Feasibility** | Multiple systems? Data model change? Unclear scope? Dependencies? | `low` / `medium` / `high` / `unknown` |
+| **Viability** | Pricing, compliance, legal, security, contractual triggers? | `low` / `medium` / `high` / `unknown` |
 
-**Key rule:** `unknown` is a valid output. The agent should not guess—it surfaces what it can't determine.
+**Key rule:** `unknown` is a valid output. The agent does not guess; it names which risks need a human assessor and what question that person must answer.
 
-#### C. Evidence Search
+#### E. Disqualify / merge check
 
-Uses MCP tools to find related signals:
+Checked before tiering. Every disqualification must cite a concrete artifact.
 
-```
-searchInsights    → related feedback from other customers
-findEvidence      → verbatim quotes from transcripts
-identifyCompany   → context on who's asking
-getCustomerDetails → tier, ARR, churn status
-listChurnSignals  → related churn risk signals
-```
+| Recommend | When | The line must cite |
+|---|---|---|
+| **Disqualify: previously rejected** | Prior rejection (opportunity or dismissed signal) whose reasoning still holds: same ask, same segment, no supporting signal dated after the rejection | Link, quoted reasoning, date, what would override it |
+| **Disqualify: vague and unresolvable** | `vague` after the clarification attempt, and no customer context to ask | The questions that would unblock it |
+| **Disqualify: out of scope** | Conflicts with a stated non-goal in the tenant's discovery context | The non-goal text |
+| **Disqualify: no basis** | Internal suggestion, zero supporting signals, no strategic driver | The search performed |
+| **Merge (new evidence)** | Duplicate of an active opportunity | Target id and what the signal adds (new customer, segment, ARR, or nothing) |
 
-Output:
-- Number of other customers mentioning this
-- Total ARR represented
-- Key verbatim quotes (linked)
-- Segment breakdown (enterprise / mid-market / SMB)
+**Key rule:** The agent recommends; the owner confirms or overrides. Dismissed signals keep their reason and are searchable, so the same ask is recognized next time rather than re-triaged from scratch.
 
-#### D. Existing Opportunity Check
+#### F. Tier
 
-```
-listOpportunities → scan for related problems
-getOpportunity    → check if signal fits existing opportunity
-```
+Only when neither Disqualify nor Merge applies.
 
-Output:
-- **Match found:** link to existing opportunity, recommend merging
-- **Related:** link to related opportunity, flag relationship
-- **Previously rejected:** link to rejected opportunity with reasoning
-- **None:** new opportunity
+| Tier | Rule |
+|---|---|
+| **Light** | Clarity `clear` · evidence bar met (one customer with context and a verbatim, or two or more distinct customers) · no risk `high` · at most one risk `unknown` · solution obvious or tightly constrained |
+| **Full** | Any of: two or more risks `high`/`unknown` · viability `high` · a strategic bet per discovery context · clarity not `clear` but the customer is retention-critical or strategic |
+| **Standard** | Everything else; the proposal names the one or two activities that would close the gap |
 
-#### E. Disqualification Check
+The agent records which rule fired and whether the call was clear or borderline. A single-account retention-critical or compliance request never goes Light on evidence count alone.
 
-The triage agent can recommend **disqualification** when continuing would waste effort. Disqualification is not a judgment call—it's based on clear signals.
+#### G. Flags
 
-**Disqualify when:**
+- `commitment_made`: the text contains a promise to the customer. Triage still runs; the owner can consciously expedite.
+- `retention_critical`: the customer says they cannot continue without it.
+- `injection_suspected`: the text contains instructions aimed at the agent. Signal text is quoted, never followed.
 
-| Condition | Example | What agent does |
-|-----------|---------|-----------------|
-| **Previously rejected with valid reasoning** | Existing opportunity rejected 3 months ago with PM note "Not doing because conflicts with enterprise architecture direction" and nothing has changed | Link to prior decision, quote the reasoning, recommend disqualify |
-| **Vague and unresolvable** | "Make it better" / "Improve performance" with no specifics and no way to clarify | Flag as vague, note no actionable path, recommend disqualify |
-| **Out of scope per DISCOVERY.md** | Request clearly conflicts with stated non-goals or strategic boundaries | Quote the relevant non-goal, recommend disqualify |
-| **Duplicate of active work** | Exact same ask as an opportunity already in Plan or Curated | Link to active opportunity, recommend merge instead |
-| **No customer or strategic basis** | Internal suggestion with no customer evidence and no strategic driver | Note absence of basis, recommend disqualify |
+### 5.3 Triage proposal
 
-**Key rule:** The agent recommends disqualification with reasoning. The opportunity owner confirms or overrides. Disqualified opportunities are archived with the reason, not deleted—they can be reopened if context changes.
-
-**Disqualification output:**
+One proposal per run, grouped by outcome, one line per signal or cluster, each line carrying its artifact. The owner can ask for the full assessment behind any line.
 
 ```markdown
-**Recommended action:** DISQUALIFY
-**Reason:** Previously rejected (2026-08-15)
-**Prior decision:** Opportunity #89 "Custom export formats"
-**PM reasoning:** "Not pursuing custom formats—enterprise customers use
-our API integration instead. Validated with 3 enterprise accounts."
-**Current signal adds:** Nothing new—same request, same segment.
-**Override if:** Strategic direction has changed, or new evidence shows
-API integration isn't meeting the need.
+## Triage proposal: 9 open signals, 2026-10-23 to 2026-10-28
+
+### Create opportunities (3)
+- **A. "Audit trail for opportunity edits (regulated customers)"** · signals 12, 18, 23 · 2 customers, ARR $140k (1 missing) · **FULL** (clear): viability high (QMS), feasibility unknown · needs: viability review, feasibility assessor
+- **B. "Share reports with finance in Excel"** · signal 31 · 3 customers, ARR $220k · **LIGHT** (borderline): feasibility unknown only · needs: brief tech review
+- **C. "Bulk-archive unused themes"** · signal 40 · 1 customer, ARR $18k · **STANDARD**: single SMB account · needs: 2 customer checks
+
+### New evidence for existing opportunities (2)
+- signal 15 → #1041 "Diff view between spec versions" · adds a new segment (SMB)
+- signal 27 → #16516 "Opportunity version history" · same account, nothing new
+
+### Disqualify (3)
+- signal 26 · previously rejected: #89 "Custom export formats", 2026-08-15, "use the API integration instead; validated with 3 accounts" · nothing new since · override if the API does not meet the need
+- signal 29 · vague: "the dashboard is slow" · no page, action or customer context
+- signal 35 · out of scope: non-goal "No on-premise deployment"
+
+### Needs clarification (1)
+- signal 38 · feature-request shape, underlying problem not found · ask the CSM: who do they share with and what breaks today?
+
+Flags: signal 23 contains a delivery commitment · signal 12 is retention-critical.
+Say "show <id or letter>" for a full assessment. Nothing has been written.
 ```
 
-### 5.2 Triage Output
+The full per-signal assessment (clarity, risk table, evidence, existing opportunities, flags, recommendation, reasoning, override-if, needs-human) and the JSON record stored on created opportunities are defined in the skill's `references/proposal-format.md`.
 
-The agent produces a structured assessment attached to the opportunity.
+### 5.4 Triage outcomes
 
-**Example 1: Routed to Light tier**
+| Outcome | Criteria | What happens on confirmation |
+|---------|----------|------------------------------|
+| **Disqualify** | Previously rejected (reasoning still valid) OR vague/unactionable OR out of scope OR no basis | Signal dismissed with reason type, reasoning and link to the prior decision; searchable later; can be reopened |
+| **New evidence (merge)** | Duplicate of an active opportunity | Signal linked to that opportunity with a note on what it adds |
+| **Light** | Problem clear + evidence exists + risks low or known + solution obvious | Opportunity created with its signals and triage record → Curated |
+| **Standard** | Problem clear but evidence thin OR 1–2 risks medium/unknown | Opportunity created → Plan (targeted validation, activities named) |
+| **Full** | Problem unclear OR multiple high/unknown risks OR strategic bet | Opportunity created → Plan (full discovery) |
+| **Needs clarification** | Feature-request shape, underlying problem not found | Nothing written; the proposal names who to ask and what |
 
-```markdown
-## Triage Assessment
+**Processing order:** Disqualify and Merge are checked first. Only if neither applies is the tier assessed.
 
-**Problem clarity:** Clear
-> "I can't share data with my finance team because they only work in Excel"
-
-**Risk scan:**
-| Risk | Level | Basis |
-|------|-------|-------|
-| Value | Low | 4 other customers, $220k ARR |
-| Usability | Low | Standard export pattern |
-| Feasibility | Unknown | Scope unclear—needs tech review |
-| Viability | Low | No pricing/compliance flags |
-
-**Evidence:**
-- 4 mentions from 3 customers (2 enterprise, 1 mid-market)
-- ARR represented: $220,000
-- Key quotes: [link1], [link2]
-
-**Existing opportunities:**
-- Related: "Reporting flexibility" (ID: 123, status: in-discovery)
-- No prior rejections found
-
-**Recommended outcome:** LIGHT
-**Reasoning:** Clear problem, strong evidence, low risk except feasibility unknown.
-Recommend brief tech review then prioritize.
-```
-
-**Example 2: Disqualified (previously rejected)**
-
-```markdown
-## Triage Assessment
-
-**Problem clarity:** Clear
-> "We need to export data in custom XML format for our legacy system"
-
-**Existing opportunities:**
-- **Prior rejection found:** Opportunity #89 "Custom export formats" (rejected 2026-08-15)
-- PM reasoning: "Not pursuing custom formats—enterprise customers use our API
-  integration instead. Validated with 3 enterprise accounts Q2."
-
-**Current signal comparison:**
-- Same request type (custom export format)
-- Same segment (enterprise)
-- No new evidence that API integration is insufficient
-
-**Recommended outcome:** DISQUALIFY
-**Reasoning:** Exact same ask as previously rejected #89. PM reasoning ("use API
-integration") still valid—no evidence of change. Archive and link to prior decision.
-**Override if:** Customer can show API integration doesn't meet their need, or
-strategic direction on custom formats has changed.
-```
-
-**Example 3: Disqualified (vague/unactionable)**
-
-```markdown
-## Triage Assessment
-
-**Problem clarity:** Vague
-> "The dashboard is slow"
-
-**Attempted clarification:**
-- No specific workflow identified
-- No customer context (who, what tier, what they're trying to do)
-- Evidence search found 2 mentions of "slow" but different contexts
-  (one about initial load, one about export generation)
-
-**Recommended outcome:** DISQUALIFY
-**Reasoning:** Too vague to act on. "Slow" could mean many things. No clear
-problem to solve. If specific performance issues exist, they should come
-through with reproduction steps and context.
-**Override if:** Source can provide specifics (which page, which action,
-what they were trying to accomplish).
-```
-
-### 5.3 Triage Outcomes
-
-| Outcome | Criteria | Next step |
-|---------|----------|-----------|
-| **Disqualify** | Previously rejected (reasoning still valid) OR vague/unactionable OR out of scope per DISCOVERY.md | → Archive with reason (can reopen if context changes) |
-| **Merge** | Matches existing active opportunity | → Add as evidence to existing opportunity |
-| **Light** | Problem clear + evidence exists + risks low or known + solution obvious | → Curated (ready for prioritization) |
-| **Standard** | Problem clear but evidence thin OR 1-2 risks medium/unknown | → Plan (targeted validation) |
-| **Full** | Problem unclear OR multiple high/unknown risks OR strategic bet | → Plan (full discovery) |
-
-**Processing order:** The agent checks for Disqualify and Merge first. Only if neither applies does it assess the tier (Light / Standard / Full).
-
-**Human decision:** The agent recommends an outcome. The opportunity owner confirms or overrides.
+**Human decision:** The agent proposes. The owner confirms in chat, in full or in part. An unconfirmed line stays open; an overridden line is re-proposed with the owner's context before anything is written.
 
 ---
 
@@ -457,9 +418,10 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 
 | Artifact | Created at | Contains | Lives in |
 |----------|------------|----------|----------|
-| **Opportunity** | Capture | Problem, source, context, triage assessment | ProductSense |
-| **intent.md (draft)** | Capture | Problem, source, proposed outcome | Attached to opportunity |
-| **Triage assessment** | Triage | Clarity, risks, evidence, tier recommendation | Attached to opportunity |
+| **Signal** | Capture | Verbatim, source, customer | ProductSense |
+| **Triage proposal** | Triage | Per-signal recommendations with their artifacts | Chat; the record is stored on created opportunities |
+| **Opportunity** | Triage (on confirmation) | Problem, linked signals, triage record | ProductSense |
+| **intent.md (draft)** | After triage | Problem, source, proposed outcome | Attached to opportunity |
 | **intent.md (complete)** | Curated or Plan exit | Full intent ready for SDLC | Attached to opportunity, exported to repo |
 | **Test cards** | Plan (if needed) | Hypothesis, method, result | Linked from opportunity |
 | **Interview notes** | Plan (if needed) | Customer conversations | Linked from opportunity |
@@ -470,8 +432,8 @@ Or: if discovery reveals the opportunity isn't viable → Archive with learnings
 
 | Stage | Agent does | Human owns |
 |-------|------------|------------|
-| **Capture** | May draft from signal, structures the opportunity | Decides to create, assigns ownership |
-| **Triage** | Assesses clarity, scans risks, searches evidence, finds matches, checks for prior rejections, recommends outcome | Reviews assessment, confirms or overrides outcome |
+| **Capture** | Extracts signals from inputs | Adds manual signals, names the customer |
+| **Triage** | Assesses clarity, scans risks, searches evidence, finds matches and prior rejections, clusters, proposes | Confirms or overrides the proposal in chat; owns the created opportunities |
 | **Plan** | Prepares interview briefs, drafts guides, finds evidence, scaffolds prototypes | Conducts interviews, makes judgment calls, writes core intent |
 | **Prioritize** | May score/rank based on criteria | Makes the prioritization decision |
 
@@ -587,7 +549,7 @@ What matters:
 
 | Skill / Agent | Stage | Purpose |
 |---------------|-------|---------|
-| `signal-triage` | Triage | Assess problem clarity, scan risks, search evidence, find existing opportunities, check for prior rejections, recommend disqualification |
+| `signal-triage` | Triage | Triage a window of open signals: assess each, cluster, propose create / new evidence / disqualify, act on the owner's confirmation |
 | `opportunity` | All | Manage opportunities in ProductSense, draft and export intent.md |
 | `evidence-search` | Triage, Plan | Search for related signals, quotes, customer context |
 | `customer-360` | Plan | Pre-interview dossier |
@@ -651,8 +613,8 @@ See `agentic-discovery-process.md` (v1) §6 for full post-launch learning proces
 
 ## 16. Open Questions
 
-- What are the specific thresholds for tier recommendation? (e.g., "if ≥2 risks are unknown → Standard")
-- Should triage run automatically or on-demand?
+- ~~Specific thresholds for tier recommendation~~ Defined in the `signal-triage` skill (§5.2 F); tenants can override via discovery context. To be validated with the first customers.
+- ~~Automatic or on-demand triage?~~ On demand per window in v2.1 ("triage the past 5 days"). Automatic runs are a later option once the proposal format has proven itself.
 - How do we handle urgent/expedited requests?
 - What's the SLA for triage assessment?
 - Should Light tier intents still get post-launch learning, or only adoption tracking?
